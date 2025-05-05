@@ -5,15 +5,15 @@
 ## Phase 1: Minimal Command-Line Setup
 *Deliverable: Project structure with basic command-line argument parsing*
 
-- [ ] Set up basic project structure
-  - [ ] Initialize TypeScript project with pnpm
-  - [ ] Configure BiomeJS for linting and formatting
-  - [ ] Create basic directory structure
-- [ ] Implement minimal command-line interface
-  - [ ] Add Yargs for command-line parsing
-  - [ ] Parse simple prompt from command line
-  - [ ] Set up help text and basic command structure
-- [ ] Create basic README with project description
+- [x] Set up basic project structure
+  - [x] Initialize TypeScript project with pnpm
+  - [x] Configure BiomeJS for linting and formatting
+  - [x] Create basic directory structure
+- [x] Implement minimal command-line interface
+  - [x] Add Yargs for command-line parsing
+  - [x] Parse simple prompt from command line
+  - [x] Set up help text and basic command structure
+- [x] Create basic README with project description
 
 ## Phase 2: LLM Integration (Anthropic)
 *Deliverable: CLI tool that can send a prompt to Anthropic API and display the response*
