@@ -6,11 +6,23 @@
  */
 
 import { parseArgs } from './cli/args';
+import { configManager } from './config';
 import { type ProviderType, createLLMProviderFromEnv } from './llm';
 
 async function main() {
   try {
     const args = parseArgs(process.argv.slice(2));
+
+    // Load configuration
+    try {
+      configManager.loadConfig();
+    } catch (error) {
+      console.error(
+        'Error loading configuration:',
+        error instanceof Error ? error.message : String(error),
+      );
+      process.exit(1);
+    }
 
     // Only show initialization message in verbose mode
     if (args.verbose) {
@@ -37,11 +49,21 @@ async function main() {
           console.log('Response:');
         }
 
-        // Always stream the response, regardless of verbose mode
-        for await (const chunk of llm.streamText(prompt)) {
-          process.stdout.write(chunk);
+        // Get streaming preference from config
+        const config = configManager.getConfig();
+        const shouldStream = config.general.stream;
+
+        if (shouldStream) {
+          // Stream the response
+          for await (const chunk of llm.streamText(prompt)) {
+            process.stdout.write(chunk);
+          }
+          console.log('\n'); // Add a newline at the end
+        } else {
+          // Generate the full response instead of streaming
+          const result = await llm.generateText(prompt);
+          console.log(result.text);
         }
-        console.log('\n'); // Add a newline at the end
 
         // Show token usage if available and verbose is enabled
         // Note: Vercel AI SDK with Anthropic doesn't provide token usage info directly

@@ -18,28 +18,29 @@
 ## Phase 2: LLM Integration (Anthropic)
 *Deliverable: CLI tool that can send a prompt to Anthropic API and display the response*
 
-- [ ] Add Vercel AI SDK for LLM integration
-- [ ] Implement connection to Anthropic API
-  - [ ] Create simple API key configuration
-  - [ ] Set up basic error handling
-- [ ] Implement response display to terminal
-  - [ ] Add streaming support for interactive environments
+- [x] Add Vercel AI SDK for LLM integration
+- [x] Implement connection to Anthropic API
+  - [x] Create simple API key configuration
+  - [x] Set up basic error handling
+- [x] Implement response display to terminal
+  - [x] Add streaming support for interactive environments
   - [ ] Implement fallback for non-interactive environments
-- [ ] Update README with installation and usage instructions
+- [x] Update README with installation and usage instructions
 
 ## Phase 3: Configuration and Profiles
 *Deliverable: Support for custom profiles and configuration*
 
-- [ ] Add TOML package for configuration files
-- [ ] Implement configuration management
-  - [ ] Create cross-platform config directory detection
-  - [ ] Create default configuration on first run
+- [x] Add TOML package for configuration files
+- [x] Implement configuration management
+  - [x] Create cross-platform config directory detection
+  - [x] Create default configuration on first run
 - [ ] Add profile support
+  - [ ] Add profiles as configuration setting
   - [ ] Implement profile selection from command line
   - [ ] Support custom system prompts per profile
   - [ ] Support custom temperature and token settings
 - [ ] Enhance API key management
-  - [ ] Implement secure storage of API keys
+  - [ ] Implement secure storage of API keys in `.api-keys` file
 - [ ] Update documentation with configuration instructions
 
 ## Phase 4: Testing Framework
@@ -109,4 +110,8 @@
 *Tasks discovered during development that weren't initially planned*
 
 - [ ] Code coloring when outputting to terminal?
+  - [ ] detect when code blocks start
+  - [ ] use highlightjs or prismjs to color input
+  - [ ] do some terminal manip to get it so that the code block gets redrawn after every chunk comes in, so the colors aren't weird from incomplete data
+  - [ ] add line numbers?
 - [ ] Add an MCP tool that lets the chat put stuff in the user's clipboard
