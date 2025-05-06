@@ -11,12 +11,6 @@ importers:
       '@ai-sdk/anthropic':
         specifier: ^1.2.10
         version: 1.2.10(zod@3.24.4)
-      '@types/node':
-        specifier: ^22.15.9
-        version: 22.15.9
-      '@types/yargs':
-        specifier: ^17.0.33
-        version: 17.0.33
       ai:
         specifier: ^4.3.13
         version: 4.3.13(react@19.1.0)(zod@3.24.4)
@@ -33,6 +27,12 @@ importers:
       '@biomejs/biome':
         specifier: ^1.9.4
         version: 1.9.4
+      '@types/node':
+        specifier: ^22.15.9
+        version: 22.15.9
+      '@types/yargs':
+        specifier: ^17.0.33
+        version: 17.0.33
 
 packages:
 
