@@ -9,7 +9,8 @@ Synapse (`sy`) is a lightweight command-line utility that serves as a quick cond
 - Configurable LLM provider selection
 - User-defined profiles with custom system prompts, temperature, and max token settings
 - Conversation history support
-- Verbose mode for usage diagnostics
+- Streaming responses by default
+- Verbose mode for configuration and usage diagnostics
 - Interactive chat mode
 - Cross-platform compatibility
 
@@ -23,7 +24,7 @@ Synapse (`sy`) is a lightweight command-line utility that serves as a quick cond
 ## Usage
 
 ```bash
-# Send a simple query to the LLM
+# Send a simple query to the LLM (responses stream to the terminal)
 sy "What is a binary tree?"
 
 # Use a specific profile for a query
@@ -34,6 +35,9 @@ sy --chat
 
 # Pipe content as context for the query
 cat file.js | sy "Explain this code"
+
+# Use verbose mode to see configuration and diagnostic information
+sy -v "Explain quantum computing"
 ```
 
 ## Development

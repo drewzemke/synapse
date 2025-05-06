@@ -15,22 +15,14 @@
         "useTemplate": "error"
       }
     },
-    "ignore": [
-      "node_modules",
-      "dist",
-      "**/*.d.ts"
-    ]
+    "ignore": ["node_modules", "dist", "**/*.d.ts"]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
     "lineWidth": 100,
-    "ignore": [
-      "node_modules",
-      "dist",
-      "**/*.d.ts"
-    ]
+    "ignore": ["node_modules", "dist", "**/*.d.ts"]
   },
   "javascript": {
     "formatter": {

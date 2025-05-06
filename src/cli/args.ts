@@ -18,7 +18,7 @@ export interface SynapseArgs {
 
 /**
  * Parse command-line arguments using Yargs
- * 
+ *
  * @param args - Command-line arguments to parse
  * @returns Parsed arguments object
  */
@@ -51,12 +51,12 @@ export function parseArgs(args: string[]): SynapseArgs {
     .help()
     .alias('help', 'h')
     .parseSync();
-    
+
   // Convert any numbers in the _ array to strings to match our interface
   const result: SynapseArgs = {
     ...parsedArgs,
-    _: parsedArgs._.map(arg => String(arg))
+    _: parsedArgs._.map((arg) => String(arg)),
   };
-  
+
   return result;
 }

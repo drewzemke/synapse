@@ -11,7 +11,8 @@ Synapse (executable: `sy`) is a lightweight command-line utility that serves as 
 - Configurable LLM provider selection
 - User-defined profiles with custom system prompts, temperature, and max token settings
 - Conversation history support
-- Verbose mode for usage diagnostics
+- Streaming responses by default
+- Verbose mode for configuration and usage diagnostics
 - Interactive chat mode
 - Cross-platform compatibility
 - Support for connecting to local MCP servers
@@ -67,8 +68,8 @@ Synapse (executable: `sy`) is a lightweight command-line utility that serves as 
 - Custom module for cross-platform config directory detection using `node:os`
 
 ### User Experience
-- Streaming detection for non-interactive environments
+- Streaming responses by default for all queries
 - Conversation history stored in user's OS data directory
-- Verbose mode (`--verbose` or `-v` flag) will display usage diagnostics *after* the LLM response is complete
+- Verbose mode (`--verbose` or `-v` flag) will display configuration and usage diagnostics alongside the LLM response
 - Error messages will be communicated clearly and briefly to the user
 - Following Unix philosophy, the tool won't implement features that can be accomplished by other common tools (e.g., output to file can be done with `> file.txt`)

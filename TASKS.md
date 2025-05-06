@@ -108,4 +108,5 @@
 ## Discovered During Work
 *Tasks discovered during development that weren't initially planned*
 
-- [ ] *This section will be populated as we progress through the project*
+- [ ] Code coloring when outputting to terminal?
+- [ ] Add an MCP tool that lets the chat put stuff in the user's clipboard
