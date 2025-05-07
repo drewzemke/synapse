@@ -34,11 +34,11 @@
 - [x] Implement configuration management
   - [x] Create cross-platform config directory detection
   - [x] Create default configuration on first run
-- [ ] Add profile support
-  - [ ] Add profiles as configuration setting
-  - [ ] Implement profile selection from command line
-  - [ ] Support custom system prompts per profile
-  - [ ] Support custom temperature and token settings
+- [x] Add profile support
+  - [x] Add profiles as configuration setting
+  - [x] Implement profile selection from command line
+  - [x] Support custom system prompts per profile
+  - [x] Support custom temperature
 - [ ] Enhance API key management
   - [ ] Implement secure storage of API keys in `.api-keys` file
 - [ ] Update documentation with configuration instructions

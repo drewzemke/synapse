@@ -12,6 +12,8 @@ import type { LLMOptions, LLMProvider, LLMResponse, TokenUsage } from '../types'
 export interface AnthropicOptions extends LLMOptions {
   /** Base URL for the Anthropic API */
   baseURL?: string;
+  /** System prompt to control the model's behavior */
+  systemPrompt?: string;
 }
 
 /**
@@ -56,6 +58,8 @@ export class AnthropicProvider implements LLMProvider {
       model: this.provider(mergedOptions.model),
       maxTokens: mergedOptions.maxTokens,
       temperature: mergedOptions.temperature,
+      // Use the system parameter for Anthropic system prompts
+      system: mergedOptions.systemPrompt,
       prompt,
     });
 
@@ -94,6 +98,8 @@ export class AnthropicProvider implements LLMProvider {
       model: this.provider(mergedOptions.model),
       maxTokens: mergedOptions.maxTokens,
       temperature: mergedOptions.temperature,
+      // Use the system parameter for Anthropic system prompts
+      system: mergedOptions.systemPrompt,
       prompt,
     });
 

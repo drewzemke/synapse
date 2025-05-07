@@ -35,7 +35,15 @@ async function main() {
       const provider = 'anthropic' as ProviderType;
       const model = process.env.SYNAPSE_MODEL || undefined; // Use default model if not specified
 
-      const llm = createLLMProviderFromEnv(provider, model);
+      // Get the specified profile (or default if none specified)
+      const profileName = args.profile;
+      const profile = configManager.getProfile(profileName);
+
+      // Create LLM provider with options from profile
+      const llm = createLLMProviderFromEnv(provider, model, {
+        temperature: profile.temperature,
+        systemPrompt: profile.system_prompt,
+      });
 
       // If we have a prompt from command line arguments, process it
       if (args._.length > 0 || args.prompt) {
@@ -43,9 +51,11 @@ async function main() {
 
         // Only show diagnostic information in verbose mode
         if (args.verbose) {
-          console.log(`Processing prompt: "${prompt}"`);
+          console.log(`Processing prompt: "${prompt}"\n`);
           console.log(`Using provider: ${provider}`);
           console.log(`Using model: ${model || 'default'}`);
+          console.log(`Using profile: ${profileName || 'default'}`);
+          console.log(`Profile temperature: ${profile.temperature}\n`);
           console.log('Response:');
         }
 
@@ -69,7 +79,7 @@ async function main() {
         // Note: Vercel AI SDK with Anthropic doesn't provide token usage info directly
         // This is left here for future implementation
         if (args.verbose && llm.getUsage) {
-          console.log('\nToken usage:');
+          console.log('Token usage:');
           console.log(llm.getUsage());
         }
       } else if (args.chat) {

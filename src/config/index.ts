@@ -5,7 +5,7 @@
 import fs from 'node:fs';
 import toml from 'toml';
 import { getConfigPaths } from './paths';
-import { DEFAULT_CONFIG, type SynapseConfig } from './types';
+import { DEFAULT_CONFIG, DEFAULT_PROFILE, type Profile, type SynapseConfig } from './types';
 
 /**
  * Configuration manager
@@ -70,6 +70,28 @@ export class ConfigManager {
   }
 
   /**
+   * Get a specific profile by name
+   * @param profileName The name of the profile to get
+   * @returns The profile, or the default profile if not found
+   */
+  public getProfile(profileName?: string): Profile {
+    if (!this.configLoaded) {
+      this.loadConfig();
+    }
+
+    // If no profile name is provided, try to use the default profile
+    const nameToUse = profileName || 'default';
+
+    // Make sure profiles exist
+    if (!this.config.profiles) {
+      return DEFAULT_PROFILE;
+    }
+
+    // Return the requested profile if it exists, otherwise the default profile
+    return this.config.profiles[nameToUse] || this.config.profiles.default || DEFAULT_PROFILE;
+  }
+
+  /**
    * Ensure the config directory exists
    * @private
    */
@@ -97,6 +119,45 @@ export class ConfigManager {
       ) {
         if ('stream' in parsedConfig.general && typeof parsedConfig.general.stream === 'boolean') {
           result.general.stream = parsedConfig.general.stream;
+        }
+      }
+
+      // Merge profiles if they exist
+      if (
+        'profiles' in parsedConfig &&
+        typeof parsedConfig.profiles === 'object' &&
+        parsedConfig.profiles !== null
+      ) {
+        result.profiles = { ...DEFAULT_CONFIG.profiles };
+
+        const profiles = parsedConfig.profiles as Record<string, unknown>;
+
+        // Iterate through each profile in the parsed config
+        for (const [profileName, profileData] of Object.entries(profiles)) {
+          if (typeof profileData === 'object' && profileData !== null) {
+            const profile = profileData as Record<string, unknown>;
+            const validatedProfile: Partial<Profile> = {};
+
+            // Validate and extract profile properties
+            if ('system_prompt' in profile && typeof profile.system_prompt === 'string') {
+              validatedProfile.system_prompt = profile.system_prompt;
+            }
+
+            if ('temperature' in profile && typeof profile.temperature === 'number') {
+              validatedProfile.temperature = profile.temperature;
+            }
+
+            // Only add profiles that have at least one valid property
+            if (Object.keys(validatedProfile).length > 0) {
+              // Create profile with defaults for any missing properties
+              if (result.profiles) {
+                result.profiles[profileName] = {
+                  ...DEFAULT_PROFILE,
+                  ...validatedProfile,
+                };
+              }
+            }
+          }
         }
       }
     }
