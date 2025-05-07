@@ -41,7 +41,7 @@
   - [x] Support custom temperature
 - [ ] Enhance API key management
   - [ ] Implement secure storage of API keys in `.api-keys` file
-- [ ] Update documentation with configuration instructions
+- [x] Update documentation with configuration instructions
 
 ## Phase 4: Testing Framework
 *Deliverable: Test suite for existing functionality*
