@@ -19,7 +19,7 @@ export interface AnthropicOptions extends LLMOptions {
 /**
  * Default model to use if none specified
  */
-const DEFAULT_MODEL = 'claude-3-opus-20240229';
+const DEFAULT_MODEL = 'claude-3-7-sonnet-latest';
 
 /**
  * Anthropic LLM provider implementation
