@@ -28,6 +28,7 @@ async function main() {
     // Only show initialization message in verbose mode
     if (args.verbose) {
       console.log('Synapse CLI initialized');
+      console.log(`Config file path: ${configManager.configFile}`);
     }
 
     // Create LLM provider from environment variables
