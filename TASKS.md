@@ -46,12 +46,12 @@
 ## Phase 4: Testing Framework
 *Deliverable: Test suite for existing functionality*
 
-- [ ] Add Vitest for testing
+- [x] Add Vitest for testing
 - [ ] Write unit tests for core functionality
-  - [ ] Command-line parsing tests
-  - [ ] Configuration management tests
+  - [x] Command-line parsing tests
+  - [x] Configuration management tests
   - [ ] LLM connection tests (with mocks)
-- [ ] Set up test automation
+- [x] Set up test automation
 
 ## Phase 5: Enhanced Input Methods
 *Deliverable: Support for piped input and file processing*
@@ -92,7 +92,7 @@
   - [ ] Improve startup time
   - [ ] Enhance streaming performance
 - [ ] Implement CI/CD pipeline
-  - [ ] Set up GitHub Actions for testing
+  - [x] Set up GitHub Actions for testing
   - [ ] Configure NPM publishing workflow
 - [ ] Add support for local MCP servers
 - [ ] Create comprehensive documentation

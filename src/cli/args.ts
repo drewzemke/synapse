@@ -45,9 +45,9 @@ export function parseArgs(args: string[]): SynapseArgs {
     })
     .example('$0 "What is a binary tree?"', 'Send a simple query to the LLM')
     .example('$0 -p coding "Explain recursion"', 'Use the coding profile for a query')
-    .example('$0 --chat', 'Start an interactive chat session')
-    .example('cat file.js | $0 "Explain this code"', 'Pipe content as context for the query')
-    .epilogue('For more information, visit https://github.com/username/synapse-cli')
+    // .example('$0 --chat', 'Start an interactive chat session')
+    // .example('cat file.js | $0 "Explain this code"', 'Pipe content as context for the query')
+    .epilogue('For more information, visit https://github.com/drewzemke/synapse')
     .help()
     .alias('help', 'h')
     .parseSync();

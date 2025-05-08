@@ -87,6 +87,12 @@ pnpm build
 # Format code with BiomeJS
 pnpm lint
 pnpm lint:fix
+
+# Run tests
+pnpm test
+
+# Run tests in watch mode during development
+pnpm test:watch
 ```
 
 ## License

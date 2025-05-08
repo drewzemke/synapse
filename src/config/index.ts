@@ -75,20 +75,22 @@ export class ConfigManager {
    * @returns The profile, or the default profile if not found
    */
   public getProfile(profileName?: string): Profile {
+    // if no profile name is provided, return the default profile
+    if (!profileName) {
+      return DEFAULT_PROFILE;
+    }
+
     if (!this.configLoaded) {
       this.loadConfig();
     }
 
-    // If no profile name is provided, try to use the default profile
-    const nameToUse = profileName || 'default';
-
-    // Make sure profiles exist
-    if (!this.config.profiles) {
-      return DEFAULT_PROFILE;
+    // if the user requested a profile that they have not defined,
+    // throw an error
+    if (!this.config.profiles || !this.config.profiles[profileName]) {
+      throw new Error('Profile does not exist');
     }
 
-    // Return the requested profile if it exists, otherwise the default profile
-    return this.config.profiles[nameToUse] || this.config.profiles.default || DEFAULT_PROFILE;
+    return this.config.profiles[profileName];
   }
 
   /**
