@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/drewzemke/synapse/compare/v1.0.0...v1.0.1) (2025-05-08)
+
+
+### Bug Fixes
+
+* **ci/cd:** update `cd` workflow permissions ([3d8eead](https://github.com/drewzemke/synapse/commit/3d8eeadd82d891f586c329f2a203bdc4a780e96b))
+
 # 1.0.0 (2025-05-08)
 
 
