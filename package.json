@@ -2,6 +2,10 @@
   "name": "@drewzemke/synapse",
   "version": "1.0.1",
   "description": "Lightweight CLI LLM Interface",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/drewzemke/synapse.git"
+  },
   "main": "dist/index.js",
   "bin": {
     "sy": "dist/index.js"
@@ -16,14 +20,7 @@
     "verify": "pnpm lint:fix && pnpm build && pnpm test",
     "semantic-release": "semantic-release"
   },
-  "keywords": [
-    "cli",
-    "llm",
-    "ai",
-    "chat",
-    "anthropic",
-    "claude"
-  ],
+  "keywords": ["cli", "llm", "ai", "chat", "anthropic", "claude"],
   "author": "",
   "license": "MIT",
   "packageManager": "pnpm@10.10.0",
