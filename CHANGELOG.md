@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/drewzemke/synapse/compare/v1.0.1...v1.0.2) (2025-05-08)
+
+
+### Bug Fixes
+
+* add git repo ref to package.json ([6a38c01](https://github.com/drewzemke/synapse/commit/6a38c017f238c9020cefeec19f9127caef048736))
+
 ## [1.0.1](https://github.com/drewzemke/synapse/compare/v1.0.0...v1.0.1) (2025-05-08)
 
 
