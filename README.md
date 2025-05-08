@@ -65,7 +65,7 @@ sy -p coding "Explain recursion"
 # Start an interactive chat session (NOTE: not yet implemented!)
 sy --chat
 
-# Pipe content as context for the query (NOTE: not yet implemented!)
+# Pipe content as context for the query
 cat file.js | sy "Explain this code"
 
 # Use verbose mode to see configuration and diagnostic information

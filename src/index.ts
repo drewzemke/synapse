@@ -6,6 +6,7 @@
  */
 
 import { parseArgs } from './cli/args';
+import { createPromptWithPipedInput } from './cli/piped-prompt';
 import { configManager } from './config';
 import { type ProviderType, createLLMProviderFromEnv } from './llm';
 
@@ -47,11 +48,18 @@ async function main() {
 
       // If we have a prompt from command line arguments, process it
       if (args._.length > 0 || args.prompt) {
-        const prompt = args.prompt || args._.join(' ');
+        // Get the base prompt from arguments
+        const basePrompt = args.prompt || args._.join(' ');
+
+        // Check for and combine with any piped input
+        const prompt = await createPromptWithPipedInput(basePrompt);
 
         // Only show diagnostic information in verbose mode
         if (args.verbose) {
-          console.log(`Processing prompt: "${prompt}"\n`);
+          console.log(`Processing prompt: "${basePrompt}"\n`);
+          if (prompt !== basePrompt) {
+            console.log('Piped input detected and added to prompt');
+          }
           console.log(`Using provider: ${provider}`);
           console.log(`Using model: ${model || 'default'}`);
           console.log(`Using profile: ${profileName || 'default'}`);

@@ -56,12 +56,12 @@
 ## Phase 5: Enhanced Input Methods
 *Deliverable: Support for piped input and file processing*
 
-- [ ] Implement piped input support
-  - [ ] Detect and read from stdin when available
-  - [ ] Combine piped content with command-line prompt
+- [x] Implement piped input support
+  - [x] Detect and read from stdin when available
+  - [x] Combine piped content with command-line prompt
 - [ ] Add Chalk for improved terminal output
 - [ ] Update documentation with advanced usage examples
-- [ ] Write tests for input functionality
+- [x] Write tests for input functionality
 
 ## Phase 6: Interactive Chat Mode
 *Deliverable: Interactive chat interface with conversation history*
