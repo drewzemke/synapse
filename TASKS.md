@@ -91,9 +91,9 @@
 - [ ] Optimize performance
   - [ ] Improve startup time
   - [ ] Enhance streaming performance
-- [ ] Implement CI/CD pipeline
+- [x] Implement CI/CD pipeline
   - [x] Set up GitHub Actions for testing
-  - [ ] Configure NPM publishing workflow
+  - [x] Configure NPM publishing workflow
 - [ ] Add support for local MCP servers
 - [ ] Create comprehensive documentation
   - [ ] Update README with all features
@@ -102,9 +102,6 @@
 - [ ] Perform security review
   - [ ] Audit dependencies
   - [ ] Review API key handling
-- [ ] Prepare for initial release
-  - [ ] Finalize version 1.0.0
-  - [ ] Publish to NPM
 
 ## Discovered During Work
 *Tasks discovered during development that weren't initially planned*
