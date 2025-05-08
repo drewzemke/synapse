@@ -200,4 +200,26 @@ describe('ConfigManager', () => {
 
     expect(profile).toEqual(DEFAULT_PROFILE);
   });
+
+  it('should use the user-defined default profile when no profile name is specified', () => {
+    // Mock config with a custom "default" profile
+    const mockConfig = `
+      [profiles.default]
+      system_prompt = "Custom default system prompt"
+      temperature = 0.5
+    `;
+
+    vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
+
+    const configManager = new ConfigManager();
+    configManager.loadConfig();
+
+    // When no profile name is provided, should use the custom "default" profile
+    const profile = configManager.getProfile();
+
+    expect(profile).toMatchObject({
+      system_prompt: 'Custom default system prompt',
+      temperature: 0.5,
+    });
+  });
 });

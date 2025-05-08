@@ -70,21 +70,33 @@ export class ConfigManager {
   }
 
   /**
+   * Get the path to the config file.
+   */
+  get configFile() {
+    return this.configPaths.configFile;
+  }
+
+  /**
    * Get a specific profile by name
    * @param profileName The name of the profile to get
    * @returns The profile, or the default profile if not found
    */
   public getProfile(profileName?: string): Profile {
-    // if no profile name is provided, return the default profile
-    if (!profileName) {
-      return DEFAULT_PROFILE;
-    }
-
     if (!this.configLoaded) {
       this.loadConfig();
     }
 
-    // if the user requested a profile that they have not defined,
+    // If no profile name is provided, check if a custom 'default' profile exists
+    if (!profileName) {
+      // If user has defined a custom 'default' profile, use that
+      if (this.config.profiles?.default) {
+        return this.config.profiles.default;
+      }
+      // Otherwise return the built-in default profile
+      return DEFAULT_PROFILE;
+    }
+
+    // If the user requested a profile that they have not defined,
     // throw an error
     if (!this.config.profiles || !this.config.profiles[profileName]) {
       throw new Error('Profile does not exist');
