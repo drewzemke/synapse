@@ -47,10 +47,10 @@
 *Deliverable: Test suite for existing functionality*
 
 - [x] Add Vitest for testing
-- [ ] Write unit tests for core functionality
+- [x] Write unit tests for core functionality
   - [x] Command-line parsing tests
   - [x] Configuration management tests
-  - [ ] LLM connection tests (with mocks)
+  - [x] LLM connection tests (with mocks)
 - [x] Set up test automation
 
 ## Phase 5: Enhanced Input Methods

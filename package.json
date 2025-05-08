@@ -12,7 +12,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check . --fix",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "verify": "pnpm lint:fix && pnpm build && pnpm test"
   },
   "keywords": ["cli", "llm", "ai", "chat", "anthropic", "claude"],
   "author": "",
