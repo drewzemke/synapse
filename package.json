@@ -20,20 +20,13 @@
     "verify": "pnpm lint:fix && pnpm build && pnpm test",
     "semantic-release": "semantic-release"
   },
-  "keywords": [
-    "cli",
-    "llm",
-    "ai",
-    "chat",
-    "anthropic",
-    "claude"
-  ],
+  "keywords": ["cli", "llm", "ai", "chat", "anthropic", "claude"],
   "author": "",
   "license": "MIT",
   "packageManager": "pnpm@10.10.0",
   "dependencies": {
     "@ai-sdk/anthropic": "^1.2.10",
-    "@std/toml": "jsr:^1.0.5",
+    "@std/toml": "npm:@jsr/std__toml@^1.0.5",
     "ai": "^4.3.13",
     "toml": "^3.0.0",
     "tsx": "^4.19.4",
@@ -51,9 +44,7 @@
   },
   "typesVersions": {
     "*": {
-      "@std/toml": [
-        "./node_modules/@std/toml/_dist/mod.d.ts"
-      ]
+      "@std/toml": ["./node_modules/@std/toml/_dist/mod.d.ts"]
     }
   },
   "publishConfig": {

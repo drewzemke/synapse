@@ -12,7 +12,7 @@ importers:
         specifier: ^1.2.10
         version: 1.2.10(zod@3.24.4)
       '@std/toml':
-        specifier: jsr:^1.0.5
+        specifier: npm:@jsr/std__toml@^1.0.5
         version: '@jsr/std__toml@1.0.5'
       ai:
         specifier: ^4.3.13
