@@ -1,7 +1,7 @@
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { getConfigPaths } from './paths';
+import { getConfigPaths, getConversationsDir } from './paths';
 
 // Mock os module
 vi.mock('node:os', () => ({
@@ -83,5 +83,16 @@ describe('Configuration Paths', () => {
       // Restore original APPDATA
       process.env.APPDATA = originalAppData;
     }
+  });
+
+  describe('getConversationsDir', () => {
+    it('should return the correct conversations directory path', () => {
+      // Mock platform to non-Windows
+      Object.defineProperty(process, 'platform', { value: 'darwin' });
+
+      const conversationsDir = getConversationsDir();
+
+      expect(conversationsDir).toBe(join(mockHomedir, '.config', 'synapse', 'conversations'));
+    });
   });
 });

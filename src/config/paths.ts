@@ -44,3 +44,12 @@ export function getConfigPaths(): ConfigPaths {
     keysFile,
   };
 }
+
+/**
+ * Get the directory path for storing conversations
+ * This is a subdirectory of the main config directory
+ */
+export function getConversationsDir(): string {
+  const { configDir } = getConfigPaths();
+  return join(configDir, 'conversations');
+}

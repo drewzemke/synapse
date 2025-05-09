@@ -3,7 +3,7 @@
  */
 
 import fs from 'node:fs';
-import toml from 'toml';
+import { parse } from '@std/toml';
 import { getConfigPaths } from './paths';
 import { DEFAULT_CONFIG, DEFAULT_PROFILE, type Profile, type SynapseConfig } from './types';
 
@@ -29,7 +29,7 @@ export class ConfigManager {
       if (fs.existsSync(this.configPaths.configFile)) {
         // Read and parse the config file
         const configContents = fs.readFileSync(this.configPaths.configFile, 'utf-8');
-        const parsedConfig = toml.parse(configContents);
+        const parsedConfig = parse(configContents);
 
         // Merge with default config to ensure all fields exist
         this.config = this.mergeConfig(parsedConfig);

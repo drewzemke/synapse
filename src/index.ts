@@ -8,6 +8,7 @@
 import { parseArgs } from './cli/args';
 import { createPromptWithPipedInput } from './cli/piped-prompt';
 import { configManager } from './config';
+import { type Conversation, addMessageToConversation, saveConversation } from './conversation';
 import { type ProviderType, createLLMProviderFromEnv } from './llm';
 
 async function main() {
@@ -72,17 +73,41 @@ async function main() {
         const config = configManager.getConfig();
         const shouldStream = config.general.stream;
 
+        // Create a new conversation
+        let conversation: Conversation = {
+          profile: profileName ?? 'default',
+          temperature: profile.temperature,
+          messages: [
+            // Add system message if present
+            ...(profile.system_prompt
+              ? [{ role: 'system' as const, content: profile.system_prompt }]
+              : []),
+            // Add user message
+            { role: 'user', content: prompt },
+          ],
+        };
+
+        let assistantResponse = '';
+
         if (shouldStream) {
           // Stream the response
           for await (const chunk of llm.streamText(prompt)) {
             process.stdout.write(chunk);
+            assistantResponse += chunk;
           }
           console.log('\n'); // Add a newline at the end
         } else {
           // Generate the full response instead of streaming
           const result = await llm.generateText(prompt);
+          assistantResponse = result.text;
           console.log(result.text);
         }
+
+        // Add assistant's response to conversation
+        conversation = addMessageToConversation(conversation, 'assistant', assistantResponse);
+
+        // Save the conversation
+        saveConversation(conversation);
 
         // Show token usage if available and verbose is enabled
         // Note: Vercel AI SDK with Anthropic doesn't provide token usage info directly

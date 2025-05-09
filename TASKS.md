@@ -63,7 +63,33 @@
 - [ ] Update documentation with advanced usage examples
 - [x] Write tests for input functionality
 
-## Phase 6: Interactive Chat Mode
+## Phase 6: Stored Conversations
+*Deliverable: Ability to save conversations and continue them later*
+
+- [x] Part 1: Conversation Storage
+  - [x] Write tests for conversation storage functionality
+    - [x] Test creating conversation directory
+    - [x] Test saving conversation to TOML file
+    - [x] Test TOML structure with profile, temperature, and messages
+  - [x] Implement conversation storage
+    - [x] Create conversation directory in user config location
+    - [x] Design TOML structure for storing conversations
+    - [x] Save most recent conversation to `last.toml`
+
+- [ ] Part 2: Conversation Continuation
+  - [ ] Write tests for conversation continuation functionality
+    - [ ] Test loading previous conversation
+    - [ ] Test appending new messages to loaded conversation
+    - [ ] Test sending full context to LLM
+  - [ ] Implement conversation continuation
+    - [ ] Implement `-e/--extend` flag to continue last conversation
+    - [ ] Load previous conversation when extending
+    - [ ] Append new user message to conversation
+    - [ ] Send full conversation context to LLM
+
+- [ ] Update documentation with conversation features
+
+## Phase 7: Interactive Chat Mode
 *Deliverable: Interactive chat interface with conversation history*
 
 - [ ] Add interactive chat mode
@@ -76,7 +102,7 @@
   - [ ] Display diagnostics after response
 - [ ] Write tests for chat functionality
 
-## Phase 7: Additional LLM Providers
+## Phase 8: Additional LLM Providers
 *Deliverable: Support for multiple LLM providers*
 
 - [ ] Add support for OpenAI
@@ -85,7 +111,7 @@
 - [ ] Create provider selection mechanism
 - [ ] Update documentation with provider-specific instructions
 
-## Phase 8: Polish and Distribution
+## Phase 9: Polish and Distribution
 *Deliverable: Production-ready package published to NPM*
 
 - [ ] Optimize performance
