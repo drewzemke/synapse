@@ -4,7 +4,6 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { parse, stringify } from '@std/toml';
 import { getConversationsDir } from '../config/paths';
 import type { Conversation } from './types';
 
@@ -20,7 +19,7 @@ export function createConversationDirectory(): void {
 }
 
 /**
- * Save a conversation to the last.toml file
+ * Save a conversation to the last.json file
  *
  * @param conversation - The conversation to save
  */
@@ -28,14 +27,14 @@ export function saveConversation(conversation: Conversation): void {
   // Ensure the conversations directory exists
   createConversationDirectory();
 
-  // Convert the conversation to TOML
-  const tomlContent = stringify(conversation);
+  // Convert the conversation to JSON
+  const jsonContent = JSON.stringify(conversation, undefined, 2);
 
-  // Write to the last.toml file
+  // Write to the last.json file
   const conversationsDir = getConversationsDir();
-  const lastConversationPath = join(conversationsDir, 'last.toml');
+  const lastConversationPath = join(conversationsDir, 'last.json');
 
-  writeFileSync(lastConversationPath, tomlContent, 'utf-8');
+  writeFileSync(lastConversationPath, jsonContent, 'utf-8');
 }
 
 /**
@@ -45,7 +44,7 @@ export function saveConversation(conversation: Conversation): void {
  */
 export function loadLastConversation(): Conversation | undefined {
   const conversationsDir = getConversationsDir();
-  const lastConversationPath = join(conversationsDir, 'last.toml');
+  const lastConversationPath = join(conversationsDir, 'last.json');
 
   // Check if the file exists
   if (!existsSync(lastConversationPath)) {
@@ -53,9 +52,9 @@ export function loadLastConversation(): Conversation | undefined {
   }
 
   try {
-    // Read and parse the TOML file
-    const tomlContent = readFileSync(lastConversationPath, 'utf-8');
-    const conversation = parse(tomlContent) as Conversation;
+    // Read and parse the JSON file
+    const jsonContent = readFileSync(lastConversationPath, 'utf-8');
+    const conversation = JSON.parse(jsonContent) as Conversation;
     return conversation;
   } catch (error) {
     console.error('Error loading last conversation:', error);

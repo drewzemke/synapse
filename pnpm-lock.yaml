@@ -11,9 +11,6 @@ importers:
       '@ai-sdk/anthropic':
         specifier: ^1.2.10
         version: 1.2.10(zod@3.24.4)
-      '@std/toml':
-        specifier: npm:@jsr/std__toml@^1.0.5
-        version: '@jsr/std__toml@1.0.5'
       ai:
         specifier: ^4.3.13
         version: 4.3.13(react@19.1.0)(zod@3.24.4)
@@ -303,12 +300,6 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.5.0':
     resolution: {integrity: sha512-gv3ZRaISU3fjPAgNsriBRqGWQL6quFx04YMPW/zD8XMLsU32mhCCbfbO6KZFLjvYpCZ8zyDEgqsgf+PwPaM7GQ==}
-
-  '@jsr/std__collections@1.0.11':
-    resolution: {integrity: sha512-+W2f22Ki8HArKSzkDz5/SLtCIAb9GH6lIWcbAgF5TR8QYqjrCHVx/ZxeonLu2lWPwn8mmu/dYZxX5AmVUH1UHA==, tarball: https://npm.jsr.io/~/11/@jsr/std__collections/1.0.11.tgz}
-
-  '@jsr/std__toml@1.0.5':
-    resolution: {integrity: sha512-qNH9bDXrScgEl8dNXrd0+UrxVaL/861Fl1z+HrHS2ZYUblMPQIiHRNAmLFoMS/f4joe8KYdppwNxptVuJ15Fmg==, tarball: https://npm.jsr.io/~/11/@jsr/std__toml/1.0.5.tgz}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -2076,12 +2067,6 @@ snapshots:
     optional: true
 
   '@jridgewell/sourcemap-codec@1.5.0': {}
-
-  '@jsr/std__collections@1.0.11': {}
-
-  '@jsr/std__toml@1.0.5':
-    dependencies:
-      '@jsr/std__collections': 1.0.11
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:

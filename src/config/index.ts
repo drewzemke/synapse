@@ -3,7 +3,7 @@
  */
 
 import fs from 'node:fs';
-import { parse } from '@std/toml';
+import { parse } from 'toml';
 import { getConfigPaths } from './paths';
 import { DEFAULT_CONFIG, DEFAULT_PROFILE, type Profile, type SynapseConfig } from './types';
 

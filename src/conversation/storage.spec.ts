@@ -4,7 +4,6 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { parse } from '@std/toml';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as pathUtils from '../config/paths';
 import type { Conversation } from './types';
@@ -88,7 +87,7 @@ describe('Conversation storage', () => {
   });
 
   describe('saveConversation', () => {
-    it('should save a conversation to the last.toml file', async () => {
+    it('should save a conversation to the last.json file', async () => {
       // Import the module under test
       const { saveConversation } = await import('./storage.js');
 
@@ -97,19 +96,19 @@ describe('Conversation storage', () => {
 
       // Get the expected file path
       const conversationsDir = pathUtils.getConversationsDir();
-      const lastConversationPath = join(conversationsDir, 'last.toml');
+      const lastConversationPath = join(conversationsDir, 'last.json');
 
       // Verify writeFileSync was called with the correct path
       expect(writeFileSync).toHaveBeenCalledWith(lastConversationPath, expect.any(String), 'utf-8');
 
-      // Get the TOML content that was written
-      const tomlContent = vi.mocked(writeFileSync).mock.calls[0][1] as string;
+      // Get the JSON content that was written
+      const jsonContent = vi.mocked(writeFileSync).mock.calls[0][1] as string;
 
-      // Parse the TOML content back to an object and verify it matches the original conversation
-      const parsedToml = parse(tomlContent) as Conversation;
-      expect(parsedToml.profile).toBe(mockConversation.profile);
-      expect(parsedToml.temperature).toBe(mockConversation.temperature);
-      expect(parsedToml.messages).toHaveLength(mockConversation.messages.length);
+      // Parse the JSON content back to an object and verify it matches the original conversation
+      const parsedJson = JSON.parse(jsonContent) as Conversation;
+      expect(parsedJson.profile).toBe(mockConversation.profile);
+      expect(parsedJson.temperature).toBe(mockConversation.temperature);
+      expect(parsedJson.messages).toHaveLength(mockConversation.messages.length);
     });
   });
 
@@ -135,24 +134,28 @@ describe('Conversation storage', () => {
       // Mock existsSync to return true (file exists)
       vi.mocked(existsSync).mockReturnValue(true);
 
-      // Mock readFileSync to return a TOML string
-      const mockToml = `
-profile = "default"
-temperature = 0.7
-
-[[messages]]
-role = "system"
-content = "You are a helpful assistant."
-
-[[messages]]
-role = "user"
-content = "How do I list files in a directory?"
-
-[[messages]]
-role = "assistant"
-content = "You can use the \`ls\` command."
+      // Mock readFileSync to return a JSON string
+      const mockJson = `
+{
+  "profile": "default",
+  "temperature": 0.7,
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant."
+    },
+    {
+      "role": "user",
+      "content": "How do I list files in a directory?"
+    },
+    {
+      "role": "assistant",
+      "content": "You can use the \`ls\` command."
+    }
+  ]
+}
 `;
-      vi.mocked(readFileSync).mockReturnValue(mockToml as unknown as Buffer);
+      vi.mocked(readFileSync).mockReturnValue(mockJson as unknown as Buffer);
 
       // Call the function
       const result = loadLastConversation();
