@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/drewzemke/synapse/compare/v1.1.0...v1.1.1) (2025-05-09)
+
+
+### Bug Fixes
+
+* better handling of jsr toml package ([8117063](https://github.com/drewzemke/synapse/commit/811706372cd9ae14f31b8caca0a030fadfb6f0c0))
+
 # [1.1.0](https://github.com/drewzemke/synapse/compare/v1.0.2...v1.1.0) (2025-05-09)
 
 
