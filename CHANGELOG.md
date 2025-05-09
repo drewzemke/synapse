@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/drewzemke/synapse/compare/v1.0.2...v1.1.0) (2025-05-09)
+
+
+### Features
+
+* **convo:** save convo to file ([1c60c80](https://github.com/drewzemke/synapse/commit/1c60c807ff414e3476c4f139e065ca3b1ec4bdee))
+
 ## [1.0.2](https://github.com/drewzemke/synapse/compare/v1.0.1...v1.0.2) (2025-05-08)
 
 
