@@ -3,7 +3,7 @@
  */
 
 import { anthropic, createAnthropic } from '@ai-sdk/anthropic';
-import { generateText, streamText } from 'ai';
+import { generateText, smoothStream, streamText } from 'ai';
 import type { Message } from '../../conversation/types';
 import type { LLMOptions, LLMProvider, LLMResponse, TokenUsage } from '../types';
 
@@ -133,6 +133,7 @@ export class AnthropicProvider implements LLMProvider {
       // Use the system parameter for Anthropic system prompts
       system: systemPrompt,
       messages: nonSystemMessages,
+      experimental_transform: smoothStream({ delayInMs: 40 }),
     });
 
     // Note: Vercel AI SDK with Anthropic doesn't provide token usage info directly

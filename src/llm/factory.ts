@@ -91,9 +91,7 @@ export function createLLMProviderFromEnv(
             ? 'ANTHROPIC_API_KEY'
             : provider === 'openai'
               ? 'OPENAI_API_KEY'
-              : provider === 'mistral'
-                ? 'MISTRAL_API_KEY'
-                : `API key for ${provider}`
+              : `API key for ${provider}`
         } environment variable.`,
     );
   }
