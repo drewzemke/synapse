@@ -1,6 +1,7 @@
 import { createAnthropic } from '@ai-sdk/anthropic';
 import { generateText, streamText } from 'ai';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Message } from '../../conversation/types';
 import { AnthropicProvider } from './anthropic';
 
 // Mock the Vercel AI SDK
@@ -76,21 +77,21 @@ describe('AnthropicProvider', () => {
 
   describe('generateText', () => {
     it('calls Vercel AI SDK with correct parameters', async () => {
-      const mockPrompt = 'Hello, world';
+      const mockMessages: Message[] = [{ role: 'user', content: 'Hello, world' }];
       const mockResponse = { text: 'Hello, human!' };
 
       (
         generateText as unknown as { mockResolvedValue: (val: { text: string }) => void }
       ).mockResolvedValue(mockResponse);
 
-      const result = await provider.generateText(mockPrompt);
+      const result = await provider.generateText(mockMessages);
 
       expect(generateText).toHaveBeenCalledWith({
         model: 'mocked-model-instance',
         maxTokens: undefined,
         temperature: undefined,
         system: undefined,
-        prompt: mockPrompt,
+        prompt: 'Hello, world',
       });
 
       expect(result).toEqual({
@@ -103,7 +104,7 @@ describe('AnthropicProvider', () => {
     });
 
     it('merges provided options with default options', async () => {
-      const mockPrompt = 'Tell me a story';
+      const mockMessages: Message[] = [{ role: 'user', content: 'Tell me a story' }];
       const mockResponse = { text: 'Once upon a time...' };
       const additionalOptions = {
         temperature: 0.8,
@@ -115,21 +116,21 @@ describe('AnthropicProvider', () => {
         generateText as unknown as { mockResolvedValue: (val: { text: string }) => void }
       ).mockResolvedValue(mockResponse);
 
-      await provider.generateText(mockPrompt, additionalOptions);
+      await provider.generateText(mockMessages, additionalOptions);
 
       expect(generateText).toHaveBeenCalledWith({
         model: 'mocked-model-instance',
         maxTokens: 100,
         temperature: 0.8,
         system: 'You are a storyteller',
-        prompt: mockPrompt,
+        prompt: 'Tell me a story',
       });
     });
   });
 
   describe('streamText', () => {
     it('calls Vercel AI SDK streamText with correct parameters', async () => {
-      const mockPrompt = 'Stream a response';
+      const mockMessages: Message[] = [{ role: 'user', content: 'Stream a response' }];
       const mockChunks = ['This', ' is', ' a', ' streamed', ' response'];
 
       const mockAsyncIterator = {
@@ -146,7 +147,7 @@ describe('AnthropicProvider', () => {
         textStream: mockAsyncIterator,
       });
 
-      const stream = provider.streamText(mockPrompt);
+      const stream = provider.streamText(mockMessages);
       const result = [];
 
       for await (const chunk of stream) {
@@ -158,14 +159,14 @@ describe('AnthropicProvider', () => {
         maxTokens: undefined,
         temperature: undefined,
         system: undefined,
-        prompt: mockPrompt,
+        messages: [{ role: 'user', content: 'Stream a response' }],
       });
 
       expect(result).toEqual(mockChunks);
     });
 
     it('calls onToken callback for each token when provided', async () => {
-      const mockPrompt = 'Stream with callback';
+      const mockMessages: Message[] = [{ role: 'user', content: 'Stream with callback' }];
       const mockChunks = ['One', ' Two', ' Three'];
       const onToken = vi.fn();
 
@@ -183,7 +184,7 @@ describe('AnthropicProvider', () => {
         textStream: mockAsyncIterator,
       });
 
-      const stream = provider.streamText(mockPrompt, undefined, onToken);
+      const stream = provider.streamText(mockMessages, undefined, onToken);
 
       for await (const _chunk of stream) {
         // Just iterate through to consume the stream
@@ -198,12 +199,14 @@ describe('AnthropicProvider', () => {
 
   describe('getUsage', () => {
     it('returns the last usage information', async () => {
+      const mockMessages: Message[] = [{ role: 'user', content: 'Get usage test' }];
+
       const mockResponse = { text: 'Response text' };
       (
         generateText as unknown as { mockResolvedValue: (val: { text: string }) => void }
       ).mockResolvedValue(mockResponse);
 
-      await provider.generateText('Get usage test');
+      await provider.generateText(mockMessages);
 
       const usage = provider.getUsage();
 

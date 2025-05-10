@@ -7,7 +7,7 @@ Synapse (`sy`) is a lightweight command-line utility that serves as a quick cond
 - Stream LLM responses directly to your terminal
 - Support for piped input
 - User-defined profiles with custom system prompts
-- Conversation history support (coming soon!)
+- Conversation history and continuation
 - Interactive chat mode (coming soon!)
 - Configurable LLM provider selection (coming soon!)
 
@@ -30,6 +30,9 @@ sy "What is a binary tree?"
 
 # Use a specific user-defined profile for a query
 sy -p coding "Explain recursion"
+
+# Continue the previous conversation
+sy -e "Can you provide an example?"
 
 # Start an interactive chat session (NOTE: not yet implemented!)
 sy --chat
@@ -94,6 +97,25 @@ pnpm lint:fix
 pnpm test
 pnpm test:watch
 ```
+
+## Conversation History
+
+Synapse automatically saves your conversation history, making it easy to continue discussions with the LLM.
+
+### Continuing Conversations
+
+When you use the `-e` or `--extend` flag, Synapse will load your most recent conversation and send the entire conversation history to the LLM for context.
+
+```shell
+# Ask an initial question
+sy "What are the SOLID principles in software design?"
+
+# Continue the conversation with follow-up questions
+sy -e "Can you explain the first one in more detail?"
+sy -e "How does that compare to the Open/Closed Principle?"
+```
+
+This allows you to build on previous answers without needing to repeat context. The conversation history is stored in your configuration directory under `conversations/last.json`.
 
 ## License
 

@@ -76,18 +76,18 @@
     - [x] Design TOML structure for storing conversations
     - [x] Save most recent conversation to `last.toml`
 
-- [ ] Part 2: Conversation Continuation
-  - [ ] Write tests for conversation continuation functionality
-    - [ ] Test loading previous conversation
-    - [ ] Test appending new messages to loaded conversation
-    - [ ] Test sending full context to LLM
-  - [ ] Implement conversation continuation
-    - [ ] Implement `-e/--extend` flag to continue last conversation
-    - [ ] Load previous conversation when extending
-    - [ ] Append new user message to conversation
-    - [ ] Send full conversation context to LLM
+- [x] Part 2: Conversation Continuation
+  - [x] Write tests for conversation continuation functionality
+    - [x] Test loading previous conversation
+    - [x] Test appending new messages to loaded conversation
+    - [x] Test sending full context to LLM
+  - [x] Implement conversation continuation
+    - [x] Implement `-e/--extend` flag to continue last conversation
+    - [x] Load previous conversation when extending
+    - [x] Append new user message to conversation
+    - [x] Send full conversation context to LLM
 
-- [ ] Update documentation with conversation features
+- [x] Update documentation with conversation features
 
 ## Phase 7: Interactive Chat Mode
 *Deliverable: Interactive chat interface with conversation history*

@@ -10,6 +10,7 @@ describe('Command Line Argument Parsing', () => {
       _: ['What is a binary tree?'],
       chat: false,
       verbose: false,
+      extend: false,
     });
   });
 
@@ -22,6 +23,7 @@ describe('Command Line Argument Parsing', () => {
       profile: 'coding',
       chat: false,
       verbose: false,
+      extend: false,
     });
   });
 
@@ -34,6 +36,7 @@ describe('Command Line Argument Parsing', () => {
       profile: 'programming',
       chat: true,
       verbose: false,
+      extend: false,
     });
   });
 
@@ -46,6 +49,7 @@ describe('Command Line Argument Parsing', () => {
       profile: 'technical',
       chat: false,
       verbose: true,
+      extend: false,
     });
   });
 
@@ -57,7 +61,30 @@ describe('Command Line Argument Parsing', () => {
       _: [],
       chat: true,
       verbose: false,
+      extend: false,
     });
+  });
+
+  // Test for extend flag functionality
+  it('should recognize the -e/--extend flag', () => {
+    // Test with short form
+    const shortArgs = parseArgs(['-e', 'How do I get it to show details?']);
+    expect(shortArgs.extend).toBe(true);
+    expect(shortArgs._).toEqual(['How do I get it to show details?']);
+
+    // Test with long form
+    const longArgs = parseArgs(['--extend', 'How do I get details?']);
+    expect(longArgs.extend).toBe(true);
+    expect(longArgs._).toEqual(['How do I get details?']);
+  });
+
+  // Test extend flag with other options
+  it('should handle extend flag with other options', () => {
+    const args = parseArgs(['-p', 'coding', '-e', '-v', 'How do I use grep?']);
+    expect(args.extend).toBe(true);
+    expect(args.profile).toBe('coding');
+    expect(args.verbose).toBe(true);
+    expect(args._).toEqual(['How do I use grep?']);
   });
 
   // Failure case: non-string values in positional arguments get converted to strings
@@ -69,6 +96,7 @@ describe('Command Line Argument Parsing', () => {
       $0: 'synapse',
       chat: false,
       verbose: false,
+      extend: false,
     };
 
     // We're going to bypass the parseArgs function and test just the conversion logic

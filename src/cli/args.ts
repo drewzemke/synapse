@@ -14,6 +14,7 @@ export interface SynapseArgs {
   profile?: string;
   chat: boolean;
   verbose: boolean;
+  extend: boolean;
 }
 
 /**
@@ -43,8 +44,15 @@ export function parseArgs(args: string[]): SynapseArgs {
       default: false,
       describe: 'Show verbose output including token usage',
     })
+    .option('extend', {
+      alias: 'e',
+      type: 'boolean',
+      default: false,
+      describe: 'Continue the previous conversation',
+    })
     .example('$0 "What is a binary tree?"', 'Send a simple query to the LLM')
     .example('$0 -p coding "Explain recursion"', 'Use the coding profile for a query')
+    .example('$0 -e "Can you give me an exmaple?"', 'Continue the previous conversation')
     .example('cat main.ts | $0 "Explain this code"', 'Pipe content as context for the query')
     // .example('$0 --chat', 'Start an interactive chat session')
     .epilogue('For more information, visit https://github.com/drewzemke/synapse')

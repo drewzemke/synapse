@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Message } from '../conversation/types';
 import {
   type ProviderType,
   createLLMProvider,
@@ -9,7 +10,11 @@ import { type LLMProvider, LLMResponse } from './types';
 
 // Mock implementation for the LLM provider to avoid actual API calls
 vi.mock('./providers/anthropic', () => {
-  const mockGenerateText = vi.fn().mockImplementation(async (prompt) => {
+  const mockGenerateText = vi.fn().mockImplementation(async (messages: Message[]) => {
+    // Extract the last user message
+    const lastUserMessage = [...messages].reverse().find((msg) => msg.role === 'user');
+    const prompt = lastUserMessage?.content || 'No user message';
+
     return {
       text: `Mock response to: ${prompt}`,
       metadata: {
@@ -23,7 +28,15 @@ vi.mock('./providers/anthropic', () => {
     };
   });
 
-  const mockStreamText = vi.fn().mockImplementation(function* (prompt, _options, onToken) {
+  const mockStreamText = vi.fn().mockImplementation(function* (
+    messages: Message[],
+    _options,
+    onToken,
+  ) {
+    // Extract the last user message
+    const lastUserMessage = [...messages].reverse().find((msg) => msg.role === 'user');
+    const prompt = lastUserMessage?.content || 'No user message';
+
     const chunks = ['Mock', ' streamed', ' response', ' to:', ` ${prompt}`];
     for (const chunk of chunks) {
       if (onToken) {
@@ -71,8 +84,8 @@ describe('LLM Integration', () => {
     });
 
     it('successfully generates text', async () => {
-      const prompt = 'Test prompt';
-      const response = await provider.generateText(prompt);
+      const messages: Message[] = [{ role: 'user', content: 'Test prompt' }];
+      const response = await provider.generateText(messages);
 
       expect(response).toBeDefined();
       expect(response.text).toContain('Mock response to: Test prompt');
@@ -82,8 +95,8 @@ describe('LLM Integration', () => {
     });
 
     it('successfully streams text', async () => {
-      const prompt = 'Stream test';
-      const stream = provider.streamText(prompt);
+      const messages: Message[] = [{ role: 'user', content: 'Stream test' }];
+      const stream = provider.streamText(messages);
       const chunks: string[] = [];
 
       for await (const chunk of stream) {
@@ -95,9 +108,9 @@ describe('LLM Integration', () => {
     });
 
     it('calls onToken callback when streaming', async () => {
-      const prompt = 'Callback test';
+      const messages: Message[] = [{ role: 'user', content: 'Callback test' }];
       const onToken = vi.fn();
-      const stream = provider.streamText(prompt, {}, onToken);
+      const stream = provider.streamText(messages, {}, onToken);
 
       for await (const _chunk of stream) {
         // Just consume the stream
@@ -119,7 +132,8 @@ describe('LLM Integration', () => {
         temperature: 0.7,
       });
 
-      const response = await provider.generateText('Test with options');
+      const messages: Message[] = [{ role: 'user', content: 'Test with options' }];
+      const response = await provider.generateText(messages);
 
       expect(response).toBeDefined();
       expect(response.text).toContain('Mock response to: Test with options');

@@ -8,7 +8,12 @@
 import { parseArgs } from './cli/args';
 import { createPromptWithPipedInput } from './cli/piped-prompt';
 import { configManager } from './config';
-import { type Conversation, addMessageToConversation, saveConversation } from './conversation';
+import {
+  type Conversation,
+  addMessageToConversation,
+  continueConversation,
+  saveConversation,
+} from './conversation';
 import { type ProviderType, createLLMProviderFromEnv } from './llm';
 
 async function main() {
@@ -65,40 +70,63 @@ async function main() {
           console.log(`Using provider: ${provider}`);
           console.log(`Using model: ${model || 'default'}`);
           console.log(`Using profile: ${profileName || 'default'}`);
-          console.log(`Profile temperature: ${profile.temperature}\n`);
-          console.log('Response:');
+          console.log(`Profile temperature: ${profile.temperature}`);
+          if (args.extend) {
+            console.log('Continuing previous conversation');
+          }
+          console.log('\nResponse:');
         }
 
         // Get streaming preference from config
         const config = configManager.getConfig();
         const shouldStream = config.general.stream;
 
-        // Create a new conversation
-        let conversation: Conversation = {
-          profile: profileName ?? 'default',
-          temperature: profile.temperature,
-          messages: [
-            // Add system message if present
-            ...(profile.system_prompt
-              ? [{ role: 'system' as const, content: profile.system_prompt }]
-              : []),
-            // Add user message
-            { role: 'user', content: prompt },
-          ],
-        };
+        // Initialize conversation
+        let conversation: Conversation;
+
+        if (args.extend) {
+          // Continue previous conversation
+          conversation = continueConversation(prompt);
+
+          // If the profile has a system prompt and the continued conversation doesn't have one,
+          // add it (this handles the case where we're creating a new conversation due to no previous one)
+          if (
+            profile.system_prompt &&
+            (conversation.messages.length === 0 || conversation.messages[0].role !== 'system')
+          ) {
+            conversation.messages.unshift({
+              role: 'system' as const,
+              content: profile.system_prompt,
+            });
+          }
+        } else {
+          // Create a new conversation
+          conversation = {
+            profile: profileName ?? 'default',
+            temperature: profile.temperature,
+            messages: [
+              // Add system message if present
+              ...(profile.system_prompt
+                ? [{ role: 'system' as const, content: profile.system_prompt }]
+                : []),
+              // Add user message
+              { role: 'user', content: prompt },
+            ],
+          };
+        }
 
         let assistantResponse = '';
 
         if (shouldStream) {
-          // Stream the response
-          for await (const chunk of llm.streamText(prompt)) {
+          // Stream the response using the conversation messages
+          for await (const chunk of llm.streamText(conversation.messages)) {
             process.stdout.write(chunk);
             assistantResponse += chunk;
           }
           console.log('\n'); // Add a newline at the end
         } else {
-          // Generate the full response instead of streaming
-          const result = await llm.generateText(prompt);
+          // Generate the full response using the conversation messages
+          const result = await llm.generateText(conversation.messages);
           assistantResponse = result.text;
           console.log(result.text);
         }

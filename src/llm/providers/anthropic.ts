@@ -4,6 +4,7 @@
 
 import { anthropic, createAnthropic } from '@ai-sdk/anthropic';
 import { generateText, streamText } from 'ai';
+import type { Message } from '../../conversation/types';
 import type { LLMOptions, LLMProvider, LLMResponse, TokenUsage } from '../types';
 
 /**
@@ -48,18 +49,41 @@ export class AnthropicProvider implements LLMProvider {
 
   /**
    * Generate text from Anthropic
-   * @param prompt The prompt to send to the LLM
+   * @param messages Array of messages to send to the LLM
    * @param options Additional options for generation
    */
-  async generateText(prompt: string, options?: Partial<AnthropicOptions>): Promise<LLMResponse> {
+  async generateText(
+    messages: Message[],
+    options?: Partial<AnthropicOptions>,
+  ): Promise<LLMResponse> {
     const mergedOptions = { ...this.options, ...options };
+
+    // Extract system message if present (first message with role "system")
+    let systemPrompt = mergedOptions.systemPrompt;
+    let userMessages: Message[] = [...messages];
+
+    // If we have a system message in the array, use it and remove from messages
+    const systemMessageIndex = messages.findIndex((msg) => msg.role === 'system');
+    if (systemMessageIndex >= 0) {
+      systemPrompt = messages[systemMessageIndex].content;
+      // Remove system message from the array
+      userMessages = [
+        ...messages.slice(0, systemMessageIndex),
+        ...messages.slice(systemMessageIndex + 1),
+      ];
+    }
+
+    // For simple cases, just use the last user message as the prompt
+    // In a real implementation, we'd convert the full message history
+    const lastUserMessage = userMessages.filter((msg) => msg.role === 'user').pop();
+    const prompt = lastUserMessage?.content || '';
 
     const result = await generateText({
       model: this.provider(mergedOptions.model),
       maxTokens: mergedOptions.maxTokens,
       temperature: mergedOptions.temperature,
       // Use the system parameter for Anthropic system prompts
-      system: mergedOptions.systemPrompt,
+      system: systemPrompt,
       prompt,
     });
 
@@ -83,24 +107,32 @@ export class AnthropicProvider implements LLMProvider {
 
   /**
    * Stream text from Anthropic
-   * @param prompt The prompt to send to the LLM
+   * @param messages Array of messages to send to the LLM
    * @param options Additional options for generation
    * @param onToken Optional callback for each token
    */
   async *streamText(
-    prompt: string,
+    messages: Message[],
     options?: Partial<AnthropicOptions>,
     onToken?: (token: string) => void,
   ): AsyncIterable<string> {
     const mergedOptions = { ...this.options, ...options };
+
+    // Extract system message if present (first message with role "system")
+    // Fallback to the options' systemp prompt
+    const systemPrompt =
+      messages.find((m) => m.role === 'system')?.content ?? mergedOptions.systemPrompt;
+
+    // Remove the system prompt from the messages
+    const nonSystemMessages = messages.filter((m) => m.role !== 'system');
 
     const result = streamText({
       model: this.provider(mergedOptions.model),
       maxTokens: mergedOptions.maxTokens,
       temperature: mergedOptions.temperature,
       // Use the system parameter for Anthropic system prompts
-      system: mergedOptions.systemPrompt,
-      prompt,
+      system: systemPrompt,
+      messages: nonSystemMessages,
     });
 
     // Note: Vercel AI SDK with Anthropic doesn't provide token usage info directly

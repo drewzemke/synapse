@@ -2,6 +2,8 @@
  * Types and interfaces for LLM providers
  */
 
+import type { Message } from '../conversation/types';
+
 /**
  * Common options for all LLM providers
  */
@@ -49,19 +51,19 @@ export interface LLMResponse {
 export interface LLMProvider {
   /**
    * Generate text from the LLM
-   * @param prompt The prompt to send to the LLM
+   * @param messages Array of messages to send to the LLM
    * @param options Additional options for generation
    */
-  generateText(prompt: string, options?: Partial<LLMOptions>): Promise<LLMResponse>;
+  generateText(messages: Message[], options?: Partial<LLMOptions>): Promise<LLMResponse>;
 
   /**
    * Stream text from the LLM
-   * @param prompt The prompt to send to the LLM
+   * @param messages Array of messages to send to the LLM
    * @param options Additional options for generation
    * @param onToken Callback function for each token received
    */
   streamText(
-    prompt: string,
+    messages: Message[],
     options?: Partial<LLMOptions>,
     onToken?: (token: string) => void,
   ): AsyncIterable<string>;
