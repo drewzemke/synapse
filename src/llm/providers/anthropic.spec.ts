@@ -8,6 +8,7 @@ import { AnthropicProvider } from './anthropic';
 vi.mock('ai', () => ({
   generateText: vi.fn(),
   streamText: vi.fn(),
+  smoothStream: vi.fn(),
 }));
 
 vi.mock('@ai-sdk/anthropic', () => ({
@@ -154,13 +155,15 @@ describe('AnthropicProvider', () => {
         result.push(chunk);
       }
 
-      expect(streamText).toHaveBeenCalledWith({
-        model: 'mocked-model-instance',
-        maxTokens: undefined,
-        temperature: undefined,
-        system: undefined,
-        messages: [{ role: 'user', content: 'Stream a response' }],
-      });
+      expect(streamText).toHaveBeenCalledWith(
+        expect.objectContaining({
+          model: 'mocked-model-instance',
+          maxTokens: undefined,
+          temperature: undefined,
+          system: undefined,
+          messages: [{ role: 'user', content: 'Stream a response' }],
+        }),
+      );
 
       expect(result).toEqual(mockChunks);
     });

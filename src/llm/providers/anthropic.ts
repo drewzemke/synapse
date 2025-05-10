@@ -134,16 +134,10 @@ export class AnthropicProvider implements LLMProvider {
       system: systemPrompt,
       messages: nonSystemMessages,
       experimental_transform: smoothStream({ delayInMs: 40 }),
+      onFinish: ({ usage }) => {
+        this.lastUsage = usage;
+      },
     });
-
-    // Note: Vercel AI SDK with Anthropic doesn't provide token usage info directly
-    // This is a placeholder for future implementation
-    this.lastUsage = {
-      // These would be populated with actual values if available
-      promptTokens: undefined,
-      completionTokens: undefined,
-      totalTokens: undefined,
-    };
 
     for await (const chunk of result.textStream) {
       if (onToken) {
@@ -155,7 +149,6 @@ export class AnthropicProvider implements LLMProvider {
 
   /**
    * Get token usage information from the last request if available
-   * Note: Vercel AI SDK with Anthropic doesn't provide token usage info directly
    */
   getUsage(): TokenUsage | undefined {
     return this.lastUsage;
