@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/drewzemke/synapse/compare/v1.1.2...v1.2.0) (2025-05-10)
+
+
+### Features
+
+* **continuation:** ability to extend previous conversations with `-e` ([d7a80bc](https://github.com/drewzemke/synapse/commit/d7a80bc34a9eb63ae6038016ba3aa262d038b39b))
+
 ## [1.1.2](https://github.com/drewzemke/synapse/compare/v1.1.1...v1.1.2) (2025-05-09)
 
 
