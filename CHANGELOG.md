@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/drewzemke/synapse/compare/v1.3.0...v1.3.1) (2025-05-10)
+
+
+### Bug Fixes
+
+* **cd:** re-format `package.json` after bumping version ([0eaedc4](https://github.com/drewzemke/synapse/commit/0eaedc4f83d6a17dd72a2df57a6e66663802508e))
+
 # [1.3.0](https://github.com/drewzemke/synapse/compare/v1.2.0...v1.3.0) (2025-05-10)
 
 
