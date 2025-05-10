@@ -12,9 +12,10 @@ export interface SynapseArgs {
   $0: string;
   prompt?: string;
   profile?: string;
-  chat: boolean;
-  verbose: boolean;
-  extend: boolean;
+  chat?: boolean;
+  verbose?: boolean;
+  extend?: boolean;
+  last?: boolean;
 }
 
 /**
@@ -24,8 +25,10 @@ export interface SynapseArgs {
  * @returns Parsed arguments object
  */
 export function parseArgs(args: string[]): SynapseArgs {
-  // Use type assertion to ensure the correct type
+  // Use exitProcess: false to prevent yargs from calling process.exit() during tests
   const parsedArgs = yargs(args)
+    .showHelpOnFail(process.env.NODE_ENV !== 'test')
+    .exitProcess(process.env.NODE_ENV !== 'test')
     .usage('Usage: $0 [options] [prompt]')
     .option('profile', {
       alias: 'p',
@@ -35,25 +38,31 @@ export function parseArgs(args: string[]): SynapseArgs {
     .option('chat', {
       alias: 'c',
       type: 'boolean',
-      default: false,
       describe: 'Start an interactive chat session',
     })
     .option('verbose', {
       alias: 'v',
       type: 'boolean',
-      default: false,
       describe: 'Show verbose output including token usage',
     })
     .option('extend', {
       alias: 'e',
       type: 'boolean',
-      default: false,
       describe: 'Continue the previous conversation',
+    })
+    .option('last', {
+      alias: 'l',
+      type: 'boolean',
+      describe: 'Show the last response from the LLM',
+    })
+    .conflicts({
+      last: ['profile', 'extend'],
     })
     .example('$0 "What is a binary tree?"', 'Send a simple query to the LLM')
     .example('$0 -p coding "Explain recursion"', 'Use the coding profile for a query')
-    .example('$0 -e "Can you give me an exmaple?"', 'Continue the previous conversation')
+    .example('$0 -e "Can you give me an example?"', 'Continue the previous conversation')
     .example('cat main.ts | $0 "Explain this code"', 'Pipe content as context for the query')
+    .example('$0 -l', 'Show the last response from the LLM')
     // .example('$0 --chat', 'Start an interactive chat session')
     .epilogue('For more information, visit https://github.com/drewzemke/synapse')
     .help()

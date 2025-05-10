@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { type SynapseArgs, parseArgs } from './args';
 
 describe('Command Line Argument Parsing', () => {
@@ -8,9 +8,6 @@ describe('Command Line Argument Parsing', () => {
 
     expect(args).toMatchObject({
       _: ['What is a binary tree?'],
-      chat: false,
-      verbose: false,
-      extend: false,
     });
   });
 
@@ -21,9 +18,6 @@ describe('Command Line Argument Parsing', () => {
     expect(args).toMatchObject({
       _: ['Explain recursion'],
       profile: 'coding',
-      chat: false,
-      verbose: false,
-      extend: false,
     });
   });
 
@@ -35,8 +29,6 @@ describe('Command Line Argument Parsing', () => {
       _: ['How do I configure tailwind?'],
       profile: 'programming',
       chat: true,
-      verbose: false,
-      extend: false,
     });
   });
 
@@ -47,9 +39,7 @@ describe('Command Line Argument Parsing', () => {
     expect(args).toMatchObject({
       _: ['What is Docker?'],
       profile: 'technical',
-      chat: false,
       verbose: true,
-      extend: false,
     });
   });
 
@@ -60,8 +50,6 @@ describe('Command Line Argument Parsing', () => {
     expect(args).toMatchObject({
       _: [],
       chat: true,
-      verbose: false,
-      extend: false,
     });
   });
 
@@ -87,6 +75,37 @@ describe('Command Line Argument Parsing', () => {
     expect(args._).toEqual(['How do I use grep?']);
   });
 
+  // Test the last flag functionality
+  it('should recognize the -l/--last flag', () => {
+    // Test with short form
+    const shortArgs = parseArgs(['-l']);
+    expect(shortArgs.last).toBe(true);
+
+    // Test with long form
+    const longArgs = parseArgs(['--last']);
+    expect(longArgs.last).toBe(true);
+  });
+
+  // Test that last flag cannot be used with profile or extend
+  it('should throw an error when last is used with profile', () => {
+    const consoleErrorMock = vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(() => parseArgs(['-l', '-p', 'coding'])).toThrow();
+    consoleErrorMock.mockRestore();
+  });
+
+  it('should throw an error when last is used with extend', () => {
+    const consoleErrorMock = vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(() => parseArgs(['-l', '-e'])).toThrow();
+    consoleErrorMock.mockRestore();
+  });
+
+  // Test that last flag works with verbose
+  it('should allow last flag with verbose flag', () => {
+    const args = parseArgs(['-l', '-v']);
+    expect(args.last).toBe(true);
+    expect(args.verbose).toBe(true);
+  });
+
   // Failure case: non-string values in positional arguments get converted to strings
   it('should convert non-string values in _ array to strings', () => {
     // We're directly manipulating the args array to simulate numbers coming in
@@ -97,6 +116,7 @@ describe('Command Line Argument Parsing', () => {
       chat: false,
       verbose: false,
       extend: false,
+      last: false,
     };
 
     // We're going to bypass the parseArgs function and test just the conversion logic

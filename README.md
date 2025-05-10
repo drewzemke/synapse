@@ -34,6 +34,9 @@ sy -p coding "Explain recursion"
 # Continue the previous conversation
 sy -e "Can you provide an example?"
 
+# Show the last response from the LLM
+sy -l
+
 # Start an interactive chat session (NOTE: not yet implemented!)
 sy --chat
 
@@ -44,6 +47,19 @@ cat file.js | sy "Explain this code"
 sy -v "Explain quantum computing"
 ```
 
+### Continuing Conversations
+
+Synapse automatically saves your conversation history, making it easy to continue discussions with the LLM.
+When you use the `-e` or `--extend` flag, Synapse will load your most recent conversation and send the entire conversation history to the LLM for context.
+
+```shell
+# Ask an initial question
+sy "What are the SOLID principles in software design?"
+
+# Continue the conversation with follow-up questions
+sy -e "Can you explain the first one in more detail?"
+sy -e "How does that compare to the Open/Closed Principle?"
+```
 
 ## Configuration
 
@@ -98,24 +114,6 @@ pnpm test
 pnpm test:watch
 ```
 
-## Conversation History
-
-Synapse automatically saves your conversation history, making it easy to continue discussions with the LLM.
-
-### Continuing Conversations
-
-When you use the `-e` or `--extend` flag, Synapse will load your most recent conversation and send the entire conversation history to the LLM for context.
-
-```shell
-# Ask an initial question
-sy "What are the SOLID principles in software design?"
-
-# Continue the conversation with follow-up questions
-sy -e "Can you explain the first one in more detail?"
-sy -e "How does that compare to the Open/Closed Principle?"
-```
-
-This allows you to build on previous answers without needing to repeat context. The conversation history is stored in your configuration directory under `conversations/last.json`.
 
 ## License
 

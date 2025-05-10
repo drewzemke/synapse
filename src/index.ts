@@ -12,6 +12,7 @@ import {
   type Conversation,
   addMessageToConversation,
   continueConversation,
+  loadLastConversation,
   saveConversation,
 } from './conversation';
 import { type ProviderType, createLLMProviderFromEnv } from './llm';
@@ -35,6 +36,26 @@ async function main() {
     if (args.verbose) {
       console.log('Synapse CLI initialized');
       console.log(`Config file path: ${configManager.configFile}`);
+    }
+
+    // Check if we should display the last LLM response
+    if (args.last) {
+      const lastConversation = loadLastConversation();
+      if (lastConversation && lastConversation.messages.length > 0) {
+        // Find the last assistant message
+        const lastAssistantMessage = lastConversation.messages
+          .filter((msg) => msg.role === 'assistant')
+          .pop();
+
+        if (lastAssistantMessage) {
+          console.log(lastAssistantMessage.content);
+        } else {
+          console.log('No previous assistant responses found.');
+        }
+      } else {
+        console.log('No previous conversations found.');
+      }
+      return;
     }
 
     // Create LLM provider from environment variables

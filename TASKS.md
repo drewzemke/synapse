@@ -132,6 +132,11 @@
 ## Discovered During Work
 *Tasks discovered during development that weren't initially planned*
 
+- [x] Add a feature to show the last LLM response
+  - [x] Implement new CLI flag (`--last`, `-l`)
+  - [x] Ensure flag conflicts with profile/extend flags
+  - [x] Retrieve and display last assistant message
+  - [x] Add unit tests
 - [ ] Code coloring when outputting to terminal?
   - [ ] detect when code blocks start
   - [ ] use highlightjs or prismjs to color input
