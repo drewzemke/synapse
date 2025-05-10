@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/drewzemke/synapse/compare/v1.2.0...v1.3.0) (2025-05-10)
+
+
+### Features
+
+* **cli:** `sy -l` to print the last response from the LLM ([4b0ba24](https://github.com/drewzemke/synapse/commit/4b0ba247ade2ff047539bbd022c95617016e6fcd))
+
 # [1.2.0](https://github.com/drewzemke/synapse/compare/v1.1.2...v1.2.0) (2025-05-10)
 
 

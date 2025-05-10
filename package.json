@@ -1,6 +1,6 @@
 {
   "name": "@drewzemke/synapse",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Lightweight CLI LLM Interface",
   "repository": {
     "type": "git",
@@ -20,7 +20,14 @@
     "verify": "pnpm lint:fix && pnpm build && pnpm test",
     "semantic-release": "semantic-release"
   },
-  "keywords": ["cli", "llm", "ai", "chat", "anthropic", "claude"],
+  "keywords": [
+    "cli",
+    "llm",
+    "ai",
+    "chat",
+    "anthropic",
+    "claude"
+  ],
   "author": "",
   "license": "MIT",
   "packageManager": "pnpm@10.10.0",
