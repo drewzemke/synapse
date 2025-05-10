@@ -86,19 +86,14 @@ export class ConfigManager {
       this.loadConfig();
     }
 
-    // If no profile name is provided, check if a custom 'default' profile exists
     if (!profileName) {
       // If user has defined a custom 'default' profile, use that
-      if (this.config.profiles?.default) {
-        return this.config.profiles.default;
-      }
       // Otherwise return the built-in default profile
-      return DEFAULT_PROFILE;
+      return this.config.profiles?.default ?? DEFAULT_PROFILE;
     }
 
-    // If the user requested a profile that they have not defined,
-    // throw an error
-    if (!this.config.profiles || !this.config.profiles[profileName]) {
+    // If the user requested a profile that they have not defined, throw an error
+    if (!this.config.profiles?.[profileName]) {
       throw new Error('Profile does not exist');
     }
 
