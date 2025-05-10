@@ -20,14 +20,7 @@
     "verify": "pnpm lint:fix && pnpm build && pnpm test",
     "semantic-release": "semantic-release"
   },
-  "keywords": [
-    "cli",
-    "llm",
-    "ai",
-    "chat",
-    "anthropic",
-    "claude"
-  ],
+  "keywords": ["cli", "llm", "ai", "chat", "anthropic", "claude"],
   "author": "",
   "license": "MIT",
   "packageManager": "pnpm@10.10.0",
@@ -42,6 +35,7 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^10.0.1",
     "@types/node": "^22.15.9",
     "@types/yargs": "^17.0.33",
