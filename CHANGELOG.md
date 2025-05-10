@@ -1,3 +1,11 @@
+# [1.4.0](https://github.com/drewzemke/synapse/compare/v1.3.1...v1.4.0) (2025-05-10)
+
+
+### Features
+
+* **cli:** print usage in verbose mode ([3c51fe0](https://github.com/drewzemke/synapse/commit/3c51fe0a73c19b89a0b5d663ff427a1bdfd7018e))
+* **cli:** smoother streaming ([9f679dd](https://github.com/drewzemke/synapse/commit/9f679ddbf0b15f9a49e227d96a5fc36d7099a82f))
+
 ## [1.3.1](https://github.com/drewzemke/synapse/compare/v1.3.0...v1.3.1) (2025-05-10)
 
 
