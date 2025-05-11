@@ -7,7 +7,7 @@
 
 import { parseArgs } from './cli/args';
 import { createPromptWithPipedInput } from './cli/piped-prompt';
-import { DEFAULT_MODEL, configManager } from './config';
+import { DEFAULT_MODEL_ANTHROPIC as DEFAULT_MODEL, configManager } from './config';
 import {
   type Conversation,
   addMessageToConversation,
@@ -15,7 +15,7 @@ import {
   loadLastConversation,
   saveConversation,
 } from './conversation';
-import { type ProviderType, createLLMFromEnv } from './llm';
+import { createLLMFromEnv } from './llm';
 
 function loadConfiguration() {
   try {
@@ -167,6 +167,8 @@ async function main() {
       }
     } catch (error) {
       if (error instanceof Error && error.message.includes('API key')) {
+        // FIXME: this error should be created where we check for the API
+        // key, and should include the correct API key name based on provider
         console.error(
           'Error: Missing API key. Please set the ANTHROPIC_API_KEY environment variable.',
         );

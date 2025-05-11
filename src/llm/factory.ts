@@ -3,12 +3,14 @@
  */
 
 import { createAnthropic } from '@ai-sdk/anthropic';
+import { createOpenAI } from '@ai-sdk/openai';
+import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import type { LanguageModel } from 'ai';
 import { LLM } from '.';
 import type { Model } from '../config';
 
 // TODO: move this elsewhere
-export type ProviderType = 'anthropic' | 'openai'; // Add more as needed
+export type ProviderType = 'anthropic' | 'openai' | 'openrouter'; // Add more as needed
 
 /**
  * Get the API key from environment variables based on provider type
@@ -19,6 +21,7 @@ export function getApiKeyFromEnv(provider: ProviderType): string | undefined {
   const envVarMap: Record<ProviderType, string> = {
     anthropic: 'ANTHROPIC_API_KEY',
     openai: 'OPENAI_API_KEY',
+    openrouter: 'OPENROUTER_API_KEY',
   };
 
   const envVar = envVarMap[provider];
@@ -44,7 +47,9 @@ export function createLLMFromEnv(modelSpec: Model): LLM {
             ? 'ANTHROPIC_API_KEY'
             : provider === 'openai'
               ? 'OPENAI_API_KEY'
-              : `API key for ${provider}`
+              : provider === 'openrouter'
+                ? 'OPENROUTER_API_KEY'
+                : `API key for ${provider}`
         } environment variable.`,
     );
   }
@@ -58,9 +63,19 @@ export function createLLMFromEnv(modelSpec: Model): LLM {
       break;
     }
 
+    case 'openai': {
+      const openai = createOpenAI({ apiKey, compatibility: 'strict' });
+      model = openai(modelStr);
+      break;
+    }
+
+    case 'openrouter': {
+      const openrouter = createOpenRouter({ apiKey });
+      model = openrouter.chat(modelStr);
+      break;
+    }
+
     // Add more providers here as they're implemented
-    // case 'openai':
-    //   ...
 
     default:
       throw new Error(`Unsupported LLM provider: ${provider}`);

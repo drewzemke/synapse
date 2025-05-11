@@ -30,7 +30,7 @@ export interface SynapseConfig {
  */
 export interface Model {
   /** Supported LLM provider types */
-  provider: 'anthropic' | 'openai';
+  provider: 'anthropic' | 'openai' | 'openrouter';
   /** The model string */
   modelStr: string;
 }
@@ -58,7 +58,17 @@ export const DEFAULT_CONFIG: SynapseConfig = {
 /**
  * Default model
  */
-export const DEFAULT_MODEL: Model = {
+export const DEFAULT_MODEL_ANTHROPIC: Model = {
   provider: 'anthropic',
   modelStr: 'claude-3-7-sonnet-latest',
+};
+
+export const DEFAULT_MODEL_OPENAI: Model = {
+  provider: 'openai',
+  modelStr: 'gpt-4-turbo',
+};
+
+export const DEFAULT_MODEL_OPEN_ROUTER: Model = {
+  provider: 'openrouter',
+  modelStr: 'anthropic/claude-3.5-sonnet',
 };

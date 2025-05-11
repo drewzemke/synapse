@@ -94,22 +94,23 @@
 *Deliverable: Interactive chat interface with conversation history*
 
 - [ ] Add interactive chat mode
-  - [ ] Implement conversation history tracking
+  - [x] Implement conversation history tracking
   - [ ] Create interactive prompt interface
   - [ ] Support multi-turn conversations
+  - [ ] Enable user to edit messages in $EDITOR
 - [ ] Add verbose mode
-  - [ ] Implement token usage tracking
+  - [x] Implement token usage tracking
   - [ ] Add response time measurement
+    - (separated by time to first token + streaming time)
   - [ ] Display diagnostics after response
-- [ ] Write tests for chat functionality
 
 ## Phase 8: Additional LLM Providers
 *Deliverable: Support for multiple LLM providers*
 
-- [ ] Add support for OpenAI
-- [ ] Add support for AWS Bedrock
-- [ ] Add support for OpenRouter
+- [x] Add support for OpenAI
+- [x] Add support for OpenRouter
 - [ ] Create provider selection mechanism
+- [ ] Add support for AWS Bedrock
 - [ ] Update documentation with provider-specific instructions
 
 ## Phase 9: Polish and Distribution
