@@ -179,11 +179,10 @@ async function main() {
         console.log(llm.getUsage());
       }
     } catch (error) {
-      if (error instanceof Error && error.message.includes('API key')) {
-        // FIXME: this error should be created where we check for the API
-        // key, and should include the correct API key name based on provider
+      // FIXME: maybe handle this elsewhere? or at least reconcile it with the error handling below this
+      if (error instanceof Error && error.message.includes('AWS region setting is missing')) {
         console.error(
-          'Error: Missing API key. Please set the ANTHROPIC_API_KEY environment variable.',
+          "Error: AWS region must be specified either by 'aws_region' in the Synapse model configuration or by setting the 'AWS_REGION' environment variable.",
         );
         process.exit(1);
       }

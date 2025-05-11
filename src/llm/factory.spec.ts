@@ -34,9 +34,9 @@ describe('LLM Factory', () => {
       expect(getApiKeyFromEnv('openai')).toBe('test-openai-key');
     });
 
-    it('returns undefined when API key is not set', () => {
+    it('throws an error when API key is not set', () => {
       process.env.ANTHROPIC_API_KEY = undefined;
-      expect(getApiKeyFromEnv('anthropic')).toBeUndefined();
+      expect(() => getApiKeyFromEnv('anthropic')).toThrow();
     });
   });
 

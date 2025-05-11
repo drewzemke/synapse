@@ -1,7 +1,5 @@
 import z from 'zod';
 
-const SUPPORTED_PROVIDERS = ['anthropic', 'openai', 'openrouter'] as const;
-
 /**
  * Default profile
  */
@@ -27,15 +25,30 @@ export const ProfileSchema = z
  * LLM model specification
  */
 export const ModelSpecSchema = z
-  .object({
-    /** Supported LLM provider types */
-    provider: z.enum(SUPPORTED_PROVIDERS),
-
-    /** The model string */
-    model: z.string(),
-  })
-  .strict()
-  .transform((data) => ({ provider: data.provider, modelStr: data.model }));
+  .discriminatedUnion('provider', [
+    z.object({
+      provider: z.literal('anthropic'),
+      model: z.string(),
+    }),
+    z.object({
+      provider: z.literal('openai'),
+      model: z.string(),
+    }),
+    z.object({
+      provider: z.literal('openrouter'),
+      model: z.string(),
+    }),
+    z.object({
+      provider: z.literal('bedrock'),
+      model: z.string(),
+      aws_region: z.string().optional(),
+    }),
+  ])
+  // remap `model` in the config to `modelStr` in the parsed object
+  .transform((data) => {
+    const { model, ...rest } = data;
+    return { ...rest, modelStr: model };
+  });
 
 export const SynapseConfigSchema = z
   .object({

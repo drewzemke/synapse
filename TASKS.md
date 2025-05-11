@@ -120,7 +120,7 @@
 
 - [ ] Optimize performance
   - [ ] Improve startup time
-  - [ ] Enhance streaming performance
+  - [x] Enhance streaming performance
 - [x] Implement CI/CD pipeline
   - [x] Set up GitHub Actions for testing
   - [x] Configure NPM publishing workflow
