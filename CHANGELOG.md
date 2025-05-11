@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/drewzemke/synapse/compare/v1.6.0...v1.6.1) (2025-05-11)
+
+
+### Bug Fixes
+
+* exit if no prompt is provided ([95b85da](https://github.com/drewzemke/synapse/commit/95b85dab8154ca238ee7d661bb1b36a5e9a37855))
+
 # [1.6.0](https://github.com/drewzemke/synapse/compare/v1.5.0...v1.6.0) (2025-05-11)
 
 
