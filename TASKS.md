@@ -112,7 +112,7 @@
 - [x] Enable specifying default model at top level of `config.toml`
 - [x] Enable specifying model via `-m/--model` in CLI
 - [x] Update documentation with provider-specific instructions (namely which API key to use)
-- [ ] Add error handling for missing or incorrectly specified models
+- [x] Add error handling for missing or incorrectly specified models
 - [ ] Add support for AWS Bedrock
 
 ## Phase 9: Polish and Distribution
@@ -147,4 +147,4 @@
   - [ ] do some terminal manip to get it so that the code block gets redrawn after every chunk comes in, so the colors aren't weird from incomplete data
   - [ ] add line numbers?
 - [ ] Add an MCP tool that lets the chat put stuff in the user's clipboard
-- [ ] refactor to use zod for config validation
+- [x] refactor to use zod for config validation

@@ -3,16 +3,16 @@
  */
 
 import fs from 'node:fs';
-import { parse } from 'toml';
+import { parse as parseToml } from 'toml';
+import { fromZodError } from 'zod-validation-error';
 import { getConfigPaths } from './paths';
 import {
   DEFAULT_CONFIG,
   DEFAULT_MODEL_ANTHROPIC,
   DEFAULT_PROFILE,
-  type ModelSpec,
-  type Profile,
-  type SynapseConfig,
-} from './types';
+  SynapseConfigSchema,
+} from './schemas';
+import type { ModelSpec, Profile, SynapseConfig } from './types';
 
 /**
  * Configuration manager
@@ -35,11 +35,15 @@ export class ConfigManager {
       // Check if config file exists
       if (fs.existsSync(this.configPaths.configFile)) {
         // Read and parse the config file
-        const configContents = fs.readFileSync(this.configPaths.configFile, 'utf-8');
-        const parsedConfig = parse(configContents);
+        const configString = fs.readFileSync(this.configPaths.configFile, 'utf-8');
+        const configObj = parseToml(configString);
 
-        // Merge with default config to ensure all fields exist
-        this.config = this.mergeConfig(parsedConfig);
+        const parseResult = SynapseConfigSchema.safeParse(configObj);
+        if (!parseResult.success) {
+          throw new Error(fromZodError(parseResult.error).toString());
+        }
+        this.config = parseResult.data;
+
         this.configLoaded = true;
       } else {
         // If file doesn't exist, use default config
@@ -142,139 +146,11 @@ export class ConfigManager {
       fs.mkdirSync(this.configPaths.configDir, { recursive: true });
     }
   }
-
-  /**
-   * Merge parsed config with default config
-   * @param parsedConfig Parsed configuration
-   * @returns Merged configuration
-   * @private
-   */
-  private mergeConfig(parsedConfig: unknown): SynapseConfig {
-    const result = { ...DEFAULT_CONFIG };
-
-    if (this.isConfigObject(parsedConfig)) {
-      // Merge general settings if they exist
-      if (
-        'general' in parsedConfig &&
-        typeof parsedConfig.general === 'object' &&
-        parsedConfig.general !== null
-      ) {
-        if ('stream' in parsedConfig.general && typeof parsedConfig.general.stream === 'boolean') {
-          result.general.stream = parsedConfig.general.stream;
-        }
-
-        if (
-          'default_model' in parsedConfig.general &&
-          typeof parsedConfig.general.default_model === 'string'
-        ) {
-          result.general.default_model = parsedConfig.general.default_model;
-        }
-        if (
-          'default_profile' in parsedConfig.general &&
-          typeof parsedConfig.general.default_profile === 'string'
-        ) {
-          result.general.default_profile = parsedConfig.general.default_profile;
-        }
-      }
-
-      // Merge profiles if they exist
-      if (
-        'profiles' in parsedConfig &&
-        typeof parsedConfig.profiles === 'object' &&
-        parsedConfig.profiles !== null
-      ) {
-        result.profiles = { ...DEFAULT_CONFIG.profiles };
-
-        const profiles = parsedConfig.profiles as Record<string, unknown>;
-
-        // Iterate through each profile in the parsed config
-        for (const [profileName, profileData] of Object.entries(profiles)) {
-          if (typeof profileData === 'object' && profileData !== null) {
-            const profile = profileData as Record<string, unknown>;
-            const validatedProfile: Partial<Profile> = {};
-
-            // Validate and extract profile properties
-            if ('system_prompt' in profile && typeof profile.system_prompt === 'string') {
-              validatedProfile.system_prompt = profile.system_prompt;
-            }
-
-            if ('temperature' in profile && typeof profile.temperature === 'number') {
-              validatedProfile.temperature = profile.temperature;
-            }
-
-            // Only add profiles that have at least one valid property
-            if (Object.keys(validatedProfile).length > 0) {
-              // Create profile with defaults for any missing properties
-              if (result.profiles) {
-                result.profiles[profileName] = {
-                  ...DEFAULT_PROFILE,
-                  ...validatedProfile,
-                };
-              }
-            }
-          }
-        }
-      }
-
-      // Merge models if they exist
-      if (
-        'models' in parsedConfig &&
-        typeof parsedConfig.models === 'object' &&
-        parsedConfig.models !== null
-      ) {
-        const models = parsedConfig.models as Record<string, unknown>;
-        const validatedModels: Record<string, ModelSpec> = {};
-
-        // Iterate through each model in the parsed config
-        for (const [modelName, modelData] of Object.entries(models)) {
-          if (typeof modelData === 'object' && modelData !== null) {
-            const model = modelData as Record<string, unknown>;
-
-            // Validate provider field
-            if (
-              !('provider' in model) ||
-              typeof model.provider !== 'string' ||
-              !['anthropic', 'openai', 'openrouter'].includes(model.provider as string)
-            ) {
-              continue; // Skip invalid provider
-            }
-
-            // Validate model field
-            if (!('model' in model) || typeof model.model !== 'string') {
-              continue; // Skip missing or invalid model string
-            }
-
-            // Add validated model
-            validatedModels[modelName] = {
-              provider: model.provider as ModelSpec['provider'],
-              modelStr: model.model as string,
-            };
-          }
-        }
-
-        // Only add models section if at least one valid model was found
-        if (Object.keys(validatedModels).length > 0) {
-          result.models = validatedModels;
-        }
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * Check if the parsed config has the expected structure
-   * @param value Value to check
-   * @returns Whether the value is a config object
-   * @private
-   */
-  private isConfigObject(value: unknown): value is Record<string, unknown> {
-    return typeof value === 'object' && value !== null && !Array.isArray(value);
-  }
 }
 
 // Export a singleton instance of the config manager
 export const configManager = new ConfigManager();
 
-// Export types
+// Export types and schemas
 export * from './types';
+export * from './schemas';

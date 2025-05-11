@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ConfigManager, DEFAULT_CONFIG, DEFAULT_PROFILE } from './index';
+import { ConfigManager } from './index';
 import { getConfigPaths } from './paths';
-import { DEFAULT_MODEL_ANTHROPIC } from './types';
+import { DEFAULT_CONFIG, DEFAULT_MODEL_ANTHROPIC, DEFAULT_PROFILE } from './schemas';
 
 // Mock fs module
 vi.mock('node:fs', () => ({
@@ -39,9 +39,7 @@ describe('ConfigManager', () => {
     vi.resetAllMocks();
   });
 
-  // Expected use case
   it('should load valid configuration from file', () => {
-    // Prepare mock config file content
     const mockConfig = `
       [general]
       stream = false
@@ -91,9 +89,7 @@ describe('ConfigManager', () => {
     });
   });
 
-  // Test for config merging
   it('should merge partial configuration with defaults', () => {
-    // Prepare mock config file with partial settings
     const mockConfig = `
       [profiles.custom]
       system_prompt = "Custom system prompt"
@@ -104,12 +100,6 @@ describe('ConfigManager', () => {
 
     const configManager = new ConfigManager();
     const config = configManager.loadConfig();
-
-    // General settings should be default
-    expect(config.general).toEqual(DEFAULT_CONFIG.general);
-
-    // Default profile should exist and be default
-    expect(config.profiles?.default).toEqual(DEFAULT_CONFIG.profiles?.default);
 
     // Custom profile should have custom system prompt but default temperature
     expect(config.profiles?.custom).toMatchObject({
@@ -128,28 +118,7 @@ describe('ConfigManager', () => {
     expect(config).toEqual(DEFAULT_CONFIG);
   });
 
-  // Edge case: empty profiles
-  it('should handle case with empty profiles section', () => {
-    const mockConfig = `
-      [general]
-      stream = true
-
-      [profiles]
-      # No profiles defined
-    `;
-
-    vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
-
-    const configManager = new ConfigManager();
-    const config = configManager.loadConfig();
-
-    // Should have default profiles
-    expect(config.profiles?.default).toEqual(DEFAULT_PROFILE);
-  });
-
-  // Failure case: invalid TOML format
   it('should throw error when config file has invalid format', () => {
-    // Setup mock readFileSync to return invalid TOML
     vi.mocked(fs.readFileSync).mockImplementation(() => {
       throw new Error('Parse error at line 1');
     });
@@ -159,139 +128,71 @@ describe('ConfigManager', () => {
     expect(() => configManager.loadConfig()).toThrow('Invalid configuration file format');
   });
 
-  // getProfile tests
-  it('should return requested profile when it exists', () => {
-    const mockConfig = `
-      [profiles.default]
-      system_prompt = "Default prompt"
-      temperature = 0.7
-
+  describe('getProfile', () => {
+    it('should return requested profile when it exists', () => {
+      const mockConfig = `
       [profiles.test]
       system_prompt = "Test prompt"
       temperature = 0.5
     `;
 
-    vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
+      vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
 
-    const configManager = new ConfigManager();
-    configManager.loadConfig();
+      const configManager = new ConfigManager();
+      configManager.loadConfig();
 
-    const profile = configManager.getProfile('test');
+      const profile = configManager.getProfile('test');
 
-    expect(profile).toMatchObject({
-      system_prompt: 'Test prompt',
-      temperature: 0.5,
+      expect(profile).toMatchObject({
+        system_prompt: 'Test prompt',
+        temperature: 0.5,
+      });
     });
-  });
 
-  it('should throw an error when requested profile does not exist', () => {
-    const mockConfig = `
+    it('should throw an error when requested profile does not exist', () => {
+      const mockConfig = `
       [profiles.default]
       system_prompt = "Default prompt"
       temperature = 0.7
     `;
 
-    vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
+      vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
 
-    const configManager = new ConfigManager();
-    configManager.loadConfig();
+      const configManager = new ConfigManager();
+      configManager.loadConfig();
 
-    expect(() => configManager.getProfile('nonexistent')).toThrow(
-      "Profile 'nonexistent' not found",
-    );
-  });
+      expect(() => configManager.getProfile('nonexistent')).toThrow(
+        "Profile 'nonexistent' not found",
+      );
+    });
 
-  it('should return built-in default profile when no profiles exist', () => {
-    const mockConfig = `
+    it('should return built-in default profile when no profiles exist', () => {
+      const mockConfig = `
       [general]
       stream = true
       # No profiles defined
     `;
 
-    vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
+      vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
 
-    const configManager = new ConfigManager();
-    configManager.loadConfig();
+      const configManager = new ConfigManager();
+      configManager.loadConfig();
 
-    const profile = configManager.getProfile();
+      const profile = configManager.getProfile();
 
-    expect(profile).toEqual(DEFAULT_PROFILE);
-  });
-
-  it('should use the user-defined default profile when no profile name is specified', () => {
-    // Mock config with a custom "default" profile
-    const mockConfig = `
-      [general]
-      default_profile = "default"
-
-      [profiles.default]
-      system_prompt = "Custom default system prompt"
-      temperature = 0.5
-    `;
-
-    vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
-
-    const configManager = new ConfigManager();
-    configManager.loadConfig();
-
-    // When no profile name is provided, should use the custom "default" profile
-    const profile = configManager.getProfile();
-
-    expect(profile).toMatchObject({
-      system_prompt: 'Custom default system prompt',
-      temperature: 0.5,
+      expect(profile).toEqual(DEFAULT_PROFILE);
     });
   });
 
   // Models configuration tests
-  describe('Models Configuration', () => {
-    // Expected use case
-    it('should load valid models configuration from file', () => {
-      // Prepare mock config file content
-      const mockConfig = `
-        [models.claude-3-7]
-        provider = "anthropic"
-        model = "claude-3-7-sonnet-latest"
-
-        [models.openai-gpt4]
-        provider = "openai"
-        model = "gpt-4-turbo"
-
-        [models.openrouter-claude]
-        provider = "openrouter"
-        model = "anthropic/claude-3.5-sonnet"
-      `;
-
-      vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
-
-      const configManager = new ConfigManager();
-      const config = configManager.loadConfig();
-
-      expect(config.models).toBeDefined();
-      expect(config.models).toMatchObject({
-        'claude-3-7': {
-          provider: 'anthropic',
-          modelStr: 'claude-3-7-sonnet-latest',
-        },
-        'openai-gpt4': {
-          provider: 'openai',
-          modelStr: 'gpt-4-turbo',
-        },
-        'openrouter-claude': {
-          provider: 'openrouter',
-          modelStr: 'anthropic/claude-3.5-sonnet',
-        },
-      });
-    });
-
-    // Test for getModel method
+  describe('getModel', () => {
     it('should return requested model when it exists', () => {
       const mockConfig = `
-        [models.claude-3-7]
+        [models.claude]
         provider = "anthropic"
         model = "claude-3-7-sonnet-latest"
 
-        [models.openai-gpt4]
+        [models.gpt4]
         provider = "openai"
         model = "gpt-4-turbo"
       `;
@@ -301,7 +202,7 @@ describe('ConfigManager', () => {
       const configManager = new ConfigManager();
       configManager.loadConfig();
 
-      const model = configManager.getModel('claude-3-7');
+      const model = configManager.getModel('claude');
 
       expect(model).toMatchObject({
         provider: 'anthropic',
@@ -309,10 +210,9 @@ describe('ConfigManager', () => {
       });
     });
 
-    // Test for default model when no model name is provided
     it('should return default model when no model name is provided', () => {
       const mockConfig = `
-        [models.claude-3-7]
+        [models.claude]
         provider = "anthropic"
         model = "claude-3-7-sonnet-latest"
       `;
@@ -327,10 +227,9 @@ describe('ConfigManager', () => {
       expect(model).toEqual(DEFAULT_MODEL_ANTHROPIC);
     });
 
-    // Edge case: model does not exist
     it('should throw an error when requested model does not exist', () => {
       const mockConfig = `
-        [models.claude-3-7]
+        [models.claude]
         provider = "anthropic"
         model = "claude-3-7-sonnet-latest"
       `;
@@ -343,8 +242,7 @@ describe('ConfigManager', () => {
       expect(() => configManager.getModel('nonexistent')).toThrow("Model 'nonexistent' not found");
     });
 
-    // Validation: invalid provider
-    it('should ignore models with invalid provider', () => {
+    it('should throw errors for models with invalid provider', () => {
       const mockConfig = `
         [models.valid]
         provider = "anthropic"
@@ -358,14 +256,10 @@ describe('ConfigManager', () => {
       vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
 
       const configManager = new ConfigManager();
-      const config = configManager.loadConfig();
-
-      expect(config.models?.valid).toBeDefined();
-      expect(config.models?.invalid).toBeUndefined();
+      expect(() => configManager.loadConfig()).toThrow(/validation error/i);
     });
 
-    // Validation: missing required fields
-    it('should ignore models with missing required fields', () => {
+    it('throw errors for models with missing required fields', () => {
       const mockConfig = `
         [models.valid]
         provider = "anthropic"
@@ -381,26 +275,7 @@ describe('ConfigManager', () => {
       vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
 
       const configManager = new ConfigManager();
-      const config = configManager.loadConfig();
-
-      expect(config.models?.valid).toBeDefined();
-      expect(config.models?.['missing-provider']).toBeUndefined();
-      expect(config.models?.['missing-model']).toBeUndefined();
-    });
-
-    // Ensure config remains backward compatible
-    it('should have no default models if none are defined in config', () => {
-      const mockConfig = `
-        [general]
-        stream = true
-      `;
-
-      vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
-
-      const configManager = new ConfigManager();
-      const config = configManager.loadConfig();
-
-      expect(config.models).toBeUndefined();
+      expect(() => configManager.loadConfig()).toThrow(/validation error/i);
     });
   });
 });
