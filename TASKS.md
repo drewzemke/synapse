@@ -113,7 +113,7 @@
 - [x] Enable specifying model via `-m/--model` in CLI
 - [x] Update documentation with provider-specific instructions (namely which API key to use)
 - [x] Add error handling for missing or incorrectly specified models
-- [ ] Add support for AWS Bedrock
+- [x] Add support for AWS Bedrock
 
 ## Phase 9: Polish and Distribution
 *Deliverable: Production-ready package published to NPM*

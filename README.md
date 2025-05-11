@@ -28,7 +28,9 @@ export ANTHROPIC_API_KEY=<your-anthropic-api-key>
 export OPENAI_API_KEY=<your-openai-api-key>
 # or
 export OPENROUTER_API_KEY=<your-openrouter-api-key>
+```
 
+```shell
 # Send a simple query to the LLM (responses stream to the terminal)
 sy "What is a binary tree?"
 
@@ -88,13 +90,13 @@ The directory will be created automatically on first run if it doesn't exist.
 ```toml
 # General settings
 [general]
-# Whether to stream responses by default
+# Whether to stream responses by default (default true)
 stream = true
 
-# Which profile to use by default (see below)
+# Which profile to use by default (default undefined)
 default_profile = 'base'
 
-# Which model to use by default (see below)
+# Which model to use by default (default undefined)
 default_model = 'claude'
 ```
 
@@ -116,9 +118,9 @@ system_prompt = "You are a creative writing assistant. Be imaginative and inspir
 temperature = 0.9
 ```
 
-### Models Configuration
+### Model Configuration
 
-You can define custom models to use with different providers. The "provider" field must be one of the supported providers ('anthropic', 'openai', or 'openrouter'), and the "model" field should be a valid model string for that provider.
+You can define custom models to use with different providers. The "provider" field must be one of the supported providers ('anthropic', 'openai', 'openrouter', or "bedrock"), and the "model" field should be a valid model string for that provider. You can define any number of model specifications and name them as you please.
 
 ```toml
 [models.claude]
@@ -132,12 +134,18 @@ model = "gpt-4-turbo"
 [models.or-claude]
 provider = "openrouter"
 model = "anthropic/claude-3.5-sonnet"
+
+[models.bedrock]
+provider = "bedrock"
+model = "anthropic.claude-3-7-sonnet-20250219-v1:0"
+aws_region = "us-west-2" # or set AWS_REGION in your shell environment
 ```
 
 For model strings, please refer to each provider's documentation:
-- Anthropic: [https://docs.anthropic.com/claude/docs/models-overview]
-- OpenAI: [https://platform.openai.com/docs/models]
-- OpenRouter: [https://openrouter.ai/docs]
+- Anthropic: https://docs.anthropic.com/claude/docs/models-overview
+- OpenAI: https://platform.openai.com/docs/models
+- OpenRouter: https://openrouter.ai/docs
+- Amazon Bedrock: https://docs.aws.amazon.com/bedrock/
 
 ## Development
 
