@@ -109,9 +109,11 @@
 
 - [x] Add support for OpenAI
 - [x] Add support for OpenRouter
-- [ ] Create provider selection mechanism
+- [x] Create provider selection mechanism via `models` section in config
+- [ ] Enable specifying default model at top level of `config.toml`
+- [ ] Enable specifying model via `-m/--model` in CLI
+- [x] Update documentation with provider-specific instructions (namely which API key to use)
 - [ ] Add support for AWS Bedrock
-- [ ] Update documentation with provider-specific instructions
 
 ## Phase 9: Polish and Distribution
 *Deliverable: Production-ready package published to NPM*

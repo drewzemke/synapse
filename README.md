@@ -7,9 +7,9 @@ Synapse (`sy`) is a lightweight command-line utility that serves as a quick cond
 - Stream LLM responses directly to your terminal
 - Support for piped input
 - User-defined profiles with custom system prompts
+- User-defined models with multiple provider support
 - Conversation history and continuation
 - Interactive chat mode (coming soon!)
-- Configurable LLM provider selection (coming soon!)
 
 ## Installation
 
@@ -19,17 +19,24 @@ npm install -g @drewzemke/synapse
 
 ## Usage
 
-> **NOTE**: For the moment, Synapse only supports Anthropic's API and is hardcoded to use Claude Sonnet 3.7. This will be made configurable soon.
+> **NOTE**: Synapse supports multiple LLM providers including Anthropic, OpenAI, and OpenRouter. You'll need to set the appropriate API key for your chosen provider in your environment.
 
 ```shell
-# ANTHROPIC_API_KEY must be set in your shell environment
-export ANTHROPIC_API_KEY=<your-api-key>
+# Set the API key for your preferred provider
+export ANTHROPIC_API_KEY=<your-anthropic-api-key>
+# or
+export OPENAI_API_KEY=<your-openai-api-key>
+# or
+export OPENROUTER_API_KEY=<your-openrouter-api-key>
 
 # Send a simple query to the LLM (responses stream to the terminal)
 sy "What is a binary tree?"
 
 # Use a specific user-defined profile for a query
 sy -p coding "Explain recursion"
+
+# Use a specific model defined in your config
+sy -m openai-gpt4 "Compare GPT-4 with Claude"
 
 # Continue the previous conversation
 sy -e "Can you provide an example?"
@@ -70,13 +77,19 @@ Synapse can be configured using a TOML file. The configuration file is automatic
 
 The directory will be created automatically on first run if it doesn't exist.
 
-### Example Configuration
+### General Settings
 
 ```toml
 # General settings
 [general]
 stream = true  # Whether to stream responses by default
+```
 
+### Profiles Configuration
+
+Profiles allow you to define different system prompts and temperature settings for different use cases.
+
+```toml
 # Default profile
 [profiles.default]
 system_prompt = "You are a helpful AI assistant."
@@ -92,6 +105,32 @@ temperature = 0.2
 system_prompt = "You are a creative writing assistant. Be imaginative and inspiring."
 temperature = 0.9
 ```
+
+### Models Configuration
+
+You can define custom models to use with different providers. The "provider" field must be one of the supported providers ('anthropic', 'openai', or 'openrouter'), and the "model" field should be a valid model string for that provider.
+
+```toml
+# Anthropic model configuration
+[models.claude]
+provider = "anthropic"
+model = "claude-3-7-sonnet-latest"
+
+# OpenAI model configuration
+[models.gpt4]
+provider = "openai"
+model = "gpt-4-turbo"
+
+# OpenRouter model configuration
+[models.or-claude]
+provider = "openrouter"
+model = "anthropic/claude-3.5-sonnet"
+```
+
+For model strings, please refer to each provider's documentation:
+- Anthropic: https://docs.anthropic.com/claude/docs/models-overview
+- OpenAI: https://platform.openai.com/docs/models
+- OpenRouter: https://openrouter.ai/docs
 
 ## Development
 

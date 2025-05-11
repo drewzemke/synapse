@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ConfigManager, DEFAULT_CONFIG, DEFAULT_PROFILE } from './index';
 import { getConfigPaths } from './paths';
+import { DEFAULT_MODEL_ANTHROPIC, DEFAULT_MODEL_OPENAI, DEFAULT_MODEL_OPEN_ROUTER } from './types';
 
 // Mock fs module
 vi.mock('node:fs', () => ({
@@ -118,7 +119,7 @@ describe('ConfigManager', () => {
     const mockConfig = `
       [general]
       stream = true
-      
+
       [profiles]
       # No profiles defined
     `;
@@ -150,7 +151,7 @@ describe('ConfigManager', () => {
       [profiles.default]
       system_prompt = "Default prompt"
       temperature = 0.7
-      
+
       [profiles.test]
       system_prompt = "Test prompt"
       temperature = 0.5
@@ -220,6 +221,167 @@ describe('ConfigManager', () => {
     expect(profile).toMatchObject({
       system_prompt: 'Custom default system prompt',
       temperature: 0.5,
+    });
+  });
+
+  // Models configuration tests
+  describe('Models Configuration', () => {
+    // Expected use case
+    it('should load valid models configuration from file', () => {
+      // Prepare mock config file content
+      const mockConfig = `
+        [models.claude-3-7]
+        provider = "anthropic"
+        model = "claude-3-7-sonnet-latest"
+
+        [models.openai-gpt4]
+        provider = "openai"
+        model = "gpt-4-turbo"
+
+        [models.openrouter-claude]
+        provider = "openrouter"
+        model = "anthropic/claude-3.5-sonnet"
+      `;
+
+      vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
+
+      const configManager = new ConfigManager();
+      const config = configManager.loadConfig();
+
+      expect(config.models).toBeDefined();
+      expect(config.models).toMatchObject({
+        'claude-3-7': {
+          provider: 'anthropic',
+          modelStr: 'claude-3-7-sonnet-latest',
+        },
+        'openai-gpt4': {
+          provider: 'openai',
+          modelStr: 'gpt-4-turbo',
+        },
+        'openrouter-claude': {
+          provider: 'openrouter',
+          modelStr: 'anthropic/claude-3.5-sonnet',
+        },
+      });
+    });
+
+    // Test for getModel method
+    it('should return requested model when it exists', () => {
+      const mockConfig = `
+        [models.claude-3-7]
+        provider = "anthropic"
+        model = "claude-3-7-sonnet-latest"
+
+        [models.openai-gpt4]
+        provider = "openai"
+        model = "gpt-4-turbo"
+      `;
+
+      vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
+
+      const configManager = new ConfigManager();
+      configManager.loadConfig();
+
+      const model = configManager.getModel('claude-3-7');
+
+      expect(model).toMatchObject({
+        provider: 'anthropic',
+        modelStr: 'claude-3-7-sonnet-latest',
+      });
+    });
+
+    // Test for default model when no model name is provided
+    it('should return default model when no model name is provided', () => {
+      const mockConfig = `
+        [models.claude-3-7]
+        provider = "anthropic"
+        model = "claude-3-7-sonnet-latest"
+      `;
+
+      vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
+
+      const configManager = new ConfigManager();
+      configManager.loadConfig();
+
+      const model = configManager.getModel();
+
+      expect(model).toEqual(DEFAULT_MODEL_ANTHROPIC);
+    });
+
+    // Edge case: model does not exist
+    it('should throw an error when requested model does not exist', () => {
+      const mockConfig = `
+        [models.claude-3-7]
+        provider = "anthropic"
+        model = "claude-3-7-sonnet-latest"
+      `;
+
+      vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
+
+      const configManager = new ConfigManager();
+      configManager.loadConfig();
+
+      expect(() => configManager.getModel('nonexistent')).toThrow('Model does not exist');
+    });
+
+    // Validation: invalid provider
+    it('should ignore models with invalid provider', () => {
+      const mockConfig = `
+        [models.valid]
+        provider = "anthropic"
+        model = "claude-3-7-sonnet-latest"
+
+        [models.invalid]
+        provider = "invalid-provider"
+        model = "some-model"
+      `;
+
+      vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
+
+      const configManager = new ConfigManager();
+      const config = configManager.loadConfig();
+
+      expect(config.models?.valid).toBeDefined();
+      expect(config.models?.invalid).toBeUndefined();
+    });
+
+    // Validation: missing required fields
+    it('should ignore models with missing required fields', () => {
+      const mockConfig = `
+        [models.valid]
+        provider = "anthropic"
+        model = "claude-3-7-sonnet-latest"
+
+        [models.missing-provider]
+        model = "some-model"
+
+        [models.missing-model]
+        provider = "anthropic"
+      `;
+
+      vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
+
+      const configManager = new ConfigManager();
+      const config = configManager.loadConfig();
+
+      expect(config.models?.valid).toBeDefined();
+      expect(config.models?.['missing-provider']).toBeUndefined();
+      expect(config.models?.['missing-model']).toBeUndefined();
+    });
+
+    // Ensure config remains backward compatible
+    it('should have no default models if none are defined in config', () => {
+      const mockConfig = `
+        [general]
+        stream = true
+      `;
+
+      vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
+
+      const configManager = new ConfigManager();
+      const config = configManager.loadConfig();
+
+      expect(config.models).toBeUndefined();
     });
   });
 });

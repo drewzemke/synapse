@@ -5,7 +5,14 @@
 import fs from 'node:fs';
 import { parse } from 'toml';
 import { getConfigPaths } from './paths';
-import { DEFAULT_CONFIG, DEFAULT_PROFILE, type Profile, type SynapseConfig } from './types';
+import {
+  DEFAULT_CONFIG,
+  DEFAULT_MODEL_ANTHROPIC,
+  DEFAULT_PROFILE,
+  type ModelSpec,
+  type Profile,
+  type SynapseConfig,
+} from './types';
 
 /**
  * Configuration manager
@@ -101,6 +108,29 @@ export class ConfigManager {
   }
 
   /**
+   * Get a specific model by name
+   * @param modelName The name of the model to get
+   * @returns The model, or the default model if not found
+   */
+  public getModel(modelName?: string): ModelSpec {
+    if (!this.configLoaded) {
+      this.loadConfig();
+    }
+
+    if (!modelName) {
+      // Return default Anthropic model if no model name is provided
+      return DEFAULT_MODEL_ANTHROPIC;
+    }
+
+    // If the user requested a model that they have not defined, throw an error
+    if (!this.config.models?.[modelName]) {
+      throw new Error('Model does not exist');
+    }
+
+    return this.config.models[modelName];
+  }
+
+  /**
    * Ensure the config directory exists
    * @private
    */
@@ -167,6 +197,48 @@ export class ConfigManager {
               }
             }
           }
+        }
+      }
+
+      // Merge models if they exist
+      if (
+        'models' in parsedConfig &&
+        typeof parsedConfig.models === 'object' &&
+        parsedConfig.models !== null
+      ) {
+        const models = parsedConfig.models as Record<string, unknown>;
+        const validatedModels: Record<string, ModelSpec> = {};
+
+        // Iterate through each model in the parsed config
+        for (const [modelName, modelData] of Object.entries(models)) {
+          if (typeof modelData === 'object' && modelData !== null) {
+            const model = modelData as Record<string, unknown>;
+
+            // Validate provider field
+            if (
+              !('provider' in model) ||
+              typeof model.provider !== 'string' ||
+              !['anthropic', 'openai', 'openrouter'].includes(model.provider as string)
+            ) {
+              continue; // Skip invalid provider
+            }
+
+            // Validate model field
+            if (!('model' in model) || typeof model.model !== 'string') {
+              continue; // Skip missing or invalid model string
+            }
+
+            // Add validated model
+            validatedModels[modelName] = {
+              provider: model.provider as ModelSpec['provider'],
+              modelStr: model.model as string,
+            };
+          }
+        }
+
+        // Only add models section if at least one valid model was found
+        if (Object.keys(validatedModels).length > 0) {
+          result.models = validatedModels;
         }
       }
     }

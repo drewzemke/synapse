@@ -7,18 +7,15 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import type { LanguageModel } from 'ai';
 import { LLM } from '.';
-import type { Model } from '../config';
-
-// TODO: move this elsewhere
-export type ProviderType = 'anthropic' | 'openai' | 'openrouter'; // Add more as needed
+import type { ModelSpec } from '../config';
 
 /**
  * Get the API key from environment variables based on provider type
  * @param provider The provider type
  * @returns The API key or undefined if not found
  */
-export function getApiKeyFromEnv(provider: ProviderType): string | undefined {
-  const envVarMap: Record<ProviderType, string> = {
+export function getApiKeyFromEnv(provider: ModelSpec['provider']): string | undefined {
+  const envVarMap: Record<ModelSpec['provider'], string> = {
     anthropic: 'ANTHROPIC_API_KEY',
     openai: 'OPENAI_API_KEY',
     openrouter: 'OPENROUTER_API_KEY',
@@ -35,7 +32,7 @@ export function getApiKeyFromEnv(provider: ProviderType): string | undefined {
  * @returns An LLM provider instance
  * @throws Error if the required API key is not found in environment variables
  */
-export function createLLMFromEnv(modelSpec: Model): LLM {
+export function createLLMFromEnv(modelSpec: ModelSpec): LLM {
   const { provider, modelStr } = modelSpec;
   const apiKey = getApiKeyFromEnv(provider);
 
