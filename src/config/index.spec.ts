@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ConfigManager, DEFAULT_CONFIG, DEFAULT_PROFILE } from './index';
 import { getConfigPaths } from './paths';
-import { DEFAULT_MODEL_ANTHROPIC, DEFAULT_MODEL_OPENAI, DEFAULT_MODEL_OPEN_ROUTER } from './types';
+import { DEFAULT_MODEL_ANTHROPIC } from './types';
 
 // Mock fs module
 vi.mock('node:fs', () => ({

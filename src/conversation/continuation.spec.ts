@@ -4,7 +4,6 @@
 
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import * as pathUtils from '../config/paths';
 import type { Conversation } from './types';
 
 // Mock the config paths
