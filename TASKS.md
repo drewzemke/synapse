@@ -39,7 +39,7 @@
   - [x] Implement profile selection from command line
   - [x] Support custom system prompts per profile
   - [x] Support custom temperature
-- [ ] Enable specifying default profile at top level of `config.toml`
+- [x] Enable specifying default profile at top level of `config.toml`
 - [x] Update documentation with configuration instructions
 
 ## Phase 4: Testing Framework
@@ -147,3 +147,4 @@
   - [ ] do some terminal manip to get it so that the code block gets redrawn after every chunk comes in, so the colors aren't weird from incomplete data
   - [ ] add line numbers?
 - [ ] Add an MCP tool that lets the chat put stuff in the user's clipboard
+- [ ] refactor to use zod for config validation

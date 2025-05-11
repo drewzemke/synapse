@@ -16,10 +16,13 @@ export interface Profile {
  * Main application configuration
  */
 export interface SynapseConfig {
+  // TODO: make this optional?
   /** General settings */
   general: {
     /** Whether to stream responses by default */
     stream?: boolean;
+    /** The name of the profile to use when no other profile is specified */
+    default_profile?: string;
     /** The name of the model to use when no other model is specified */
     default_model?: string;
   };

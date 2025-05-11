@@ -88,9 +88,14 @@ The directory will be created automatically on first run if it doesn't exist.
 ```toml
 # General settings
 [general]
-stream = true  # Whether to stream responses by default
+# Whether to stream responses by default
+stream = true
 
-default_model = 'claude'  # Which model (defined in the `models` section; see below) to default to
+# Which profile to use by default (see below)
+default_profile = 'base'
+
+# Which model to use by default (see below)
+default_model = 'claude'
 ```
 
 ### Profiles Configuration
@@ -98,17 +103,14 @@ default_model = 'claude'  # Which model (defined in the `models` section; see be
 Profiles allow you to define different system prompts and temperature settings for different use cases.
 
 ```toml
-# Default profile
-[profiles.default]
+[profiles.base]
 system_prompt = "You are a helpful AI assistant."
 temperature = 0.7
 
-# Custom profile for coding tasks
 [profiles.coding]
 system_prompt = "You are a coding assistant. Provide concise, practical answers with code examples."
 temperature = 0.2
 
-# Custom profile for creative writing
 [profiles.creative]
 system_prompt = "You are a creative writing assistant. Be imaginative and inspiring."
 temperature = 0.9
@@ -119,26 +121,23 @@ temperature = 0.9
 You can define custom models to use with different providers. The "provider" field must be one of the supported providers ('anthropic', 'openai', or 'openrouter'), and the "model" field should be a valid model string for that provider.
 
 ```toml
-# Anthropic model configuration
 [models.claude]
 provider = "anthropic"
 model = "claude-3-7-sonnet-latest"
 
-# OpenAI model configuration
 [models.gpt4]
 provider = "openai"
 model = "gpt-4-turbo"
 
-# OpenRouter model configuration
 [models.or-claude]
 provider = "openrouter"
 model = "anthropic/claude-3.5-sonnet"
 ```
 
 For model strings, please refer to each provider's documentation:
-- Anthropic: https://docs.anthropic.com/claude/docs/models-overview
-- OpenAI: https://platform.openai.com/docs/models
-- OpenRouter: https://openrouter.ai/docs
+- Anthropic: [https://docs.anthropic.com/claude/docs/models-overview]
+- OpenAI: [https://platform.openai.com/docs/models]
+- OpenRouter: [https://openrouter.ai/docs]
 
 ## Development
 

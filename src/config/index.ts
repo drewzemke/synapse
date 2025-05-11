@@ -94,9 +94,12 @@ export class ConfigManager {
     }
 
     if (!profileName) {
-      // If user has defined a custom 'default' profile, use that
-      // Otherwise return the built-in default profile
-      return this.config.profiles?.default ?? DEFAULT_PROFILE;
+      // fall back to the default profile defined in the config,
+      // or the built-in default if that fails
+      // FIXME: this sucks
+      return this.config.general.default_profile
+        ? (this.config.profiles?.[this.config.general.default_profile] ?? DEFAULT_PROFILE)
+        : DEFAULT_PROFILE;
     }
 
     // If the user requested a profile that they have not defined, throw an error
@@ -165,6 +168,12 @@ export class ConfigManager {
           typeof parsedConfig.general.default_model === 'string'
         ) {
           result.general.default_model = parsedConfig.general.default_model;
+        }
+        if (
+          'default_profile' in parsedConfig.general &&
+          typeof parsedConfig.general.default_profile === 'string'
+        ) {
+          result.general.default_profile = parsedConfig.general.default_profile;
         }
       }
 

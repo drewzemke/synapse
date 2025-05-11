@@ -45,14 +45,20 @@ describe('ConfigManager', () => {
     const mockConfig = `
       [general]
       stream = false
+      default_profile = "base"
+      default_model = "claude"
 
-      [profiles.default]
+      [profiles.base]
       system_prompt = "You are a helpful CLI assistant."
       temperature = 0.5
 
       [profiles.coding]
       system_prompt = "You are a coding assistant."
       temperature = 0.3
+
+      [models.claude]
+      provider = "anthropic"
+      model = "claude-3-7-sonnet-latest"
     `;
 
     vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
@@ -63,15 +69,23 @@ describe('ConfigManager', () => {
     expect(config).toMatchObject({
       general: {
         stream: false,
+        default_model: 'claude',
+        default_profile: 'base',
       },
       profiles: {
-        default: {
+        base: {
           system_prompt: 'You are a helpful CLI assistant.',
           temperature: 0.5,
         },
         coding: {
           system_prompt: 'You are a coding assistant.',
           temperature: 0.3,
+        },
+      },
+      models: {
+        claude: {
+          provider: 'anthropic',
+          modelStr: 'claude-3-7-sonnet-latest',
         },
       },
     });
@@ -207,6 +221,9 @@ describe('ConfigManager', () => {
   it('should use the user-defined default profile when no profile name is specified', () => {
     // Mock config with a custom "default" profile
     const mockConfig = `
+      [general]
+      default_profile = "default"
+
       [profiles.default]
       system_prompt = "Custom default system prompt"
       temperature = 0.5

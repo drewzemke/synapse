@@ -82,10 +82,12 @@ async function main() {
       const config = configManager.getConfig();
 
       // Get the specified profile (or default if none specified)
+      // TODO: refactor some of this to be in the config manager
       const profileName = args.profile;
       const profile = configManager.getProfile(profileName);
 
       // Get the specified model (or default if none specified)
+      // TODO: refactor some of this to be in the config manager
       let model: ModelSpec;
       if (args.model) {
         // If a model is specified via command line, get it from config
@@ -115,7 +117,7 @@ async function main() {
         }
         console.log(`Using provider: ${model.provider}`);
         console.log(`Using model: ${model.modelStr}`);
-        console.log(`Using profile: ${profileName || 'default'}`);
+        console.log(`Using profile: ${profileName || '<none>'}`);
         console.log(`Profile temperature: ${profile.temperature}`);
         if (args.extend) {
           console.log('Continuing previous conversation');
