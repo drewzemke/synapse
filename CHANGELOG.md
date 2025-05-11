@@ -1,3 +1,14 @@
+# [1.5.0](https://github.com/drewzemke/synapse/compare/v1.4.0...v1.5.0) (2025-05-11)
+
+
+### Features
+
+* **config:** add model specification to config ([8f06c56](https://github.com/drewzemke/synapse/commit/8f06c56fc08159737a489e744fbe8d87d6d545eb))
+* **config:** simplify and improve config parsing/validation ([61a09aa](https://github.com/drewzemke/synapse/commit/61a09aa14a6e49c9b496157d6a691df51f2a377b))
+* **profiles:** specify a default config in the "general" section of `config.yaml` ([69e9ae7](https://github.com/drewzemke/synapse/commit/69e9ae7751b882798cb0ea623e8a2146d63dd390))
+* **providers:** specify a default model in `general` section of config.toml ([a2be203](https://github.com/drewzemke/synapse/commit/a2be2034c4dcf04c6f0a3978b210c0d262587691))
+* **providers:** specify model from config with `-m` or `--model` ([4e7d17a](https://github.com/drewzemke/synapse/commit/4e7d17aa95497e62dcd77d3d96044a0814ebfa45))
+
 # [1.4.0](https://github.com/drewzemke/synapse/compare/v1.3.1...v1.4.0) (2025-05-10)
 
 
