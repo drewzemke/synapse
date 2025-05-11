@@ -75,6 +75,7 @@ async function main() {
 
     if (args._.length === 0 && !args.prompt) {
       console.log('No prompt provided. Use --help for usage information.');
+      process.exit(1);
     }
 
     // Create LLM provider from environment variables
