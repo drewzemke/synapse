@@ -7,7 +7,7 @@
 
 import { parseArgs } from './cli/args';
 import { createPromptWithPipedInput } from './cli/piped-prompt';
-import { configManager } from './config';
+import { DEFAULT_MODEL, configManager } from './config';
 import {
   type Conversation,
   addMessageToConversation,
@@ -15,7 +15,7 @@ import {
   loadLastConversation,
   saveConversation,
 } from './conversation';
-import { type ProviderType, createLLMProviderFromEnv } from './llm';
+import { type ProviderType, createLLMFromEnv } from './llm';
 
 function loadConfiguration() {
   try {
@@ -79,19 +79,15 @@ async function main() {
 
     // Create LLM provider from environment variables
     try {
-      // Default to Anthropic as the provider for now
-      const provider = 'anthropic' as ProviderType;
-      const model = undefined; // Use default model if not specified
+      // TODO: get the model from the user's configuration
+      const model = DEFAULT_MODEL;
 
       // Get the specified profile (or default if none specified)
       const profileName = args.profile;
       const profile = configManager.getProfile(profileName);
 
       // Create LLM provider with options from profile
-      const llm = createLLMProviderFromEnv(provider, model, {
-        temperature: profile.temperature,
-        systemPrompt: profile.system_prompt,
-      });
+      const llm = createLLMFromEnv(model);
 
       // Get the base prompt from arguments
       const basePrompt = args.prompt || args._.join(' ');
@@ -105,8 +101,8 @@ async function main() {
         if (prompt !== basePrompt) {
           console.log('Piped input detected and added to prompt');
         }
-        console.log(`Using provider: ${provider}`);
-        console.log(`Using model: ${model || 'default'}`);
+        console.log(`Using provider: ${model.provider}`);
+        console.log(`Using model: ${model.modelStr}`);
         console.log(`Using profile: ${profileName || 'default'}`);
         console.log(`Profile temperature: ${profile.temperature}`);
         if (args.extend) {
@@ -125,18 +121,6 @@ async function main() {
       if (args.extend) {
         // Continue previous conversation
         conversation = continueConversation(prompt);
-
-        // If the profile has a system prompt and the continued conversation doesn't have one,
-        // add it (this handles the case where we're creating a new conversation due to no previous one)
-        if (
-          profile.system_prompt &&
-          (conversation.messages.length === 0 || conversation.messages[0].role !== 'system')
-        ) {
-          conversation.messages.unshift({
-            role: 'system' as const,
-            content: profile.system_prompt,
-          });
-        }
       } else {
         // Create a new conversation
         conversation = {
@@ -164,7 +148,7 @@ async function main() {
         console.log('\n'); // Add a newline at the end
       } else {
         // Generate the full response using the conversation messages
-        assistantResponse = (await llm.generateText(conversation.messages)).text;
+        assistantResponse = await llm.generateText(conversation.messages);
         console.log(assistantResponse);
       }
 

@@ -26,6 +26,16 @@ export interface SynapseConfig {
 }
 
 /**
+ * Model configuration
+ */
+export interface Model {
+  /** Supported LLM provider types */
+  provider: 'anthropic' | 'openai';
+  /** The model string */
+  modelStr: string;
+}
+
+/**
  * Default profile
  */
 export const DEFAULT_PROFILE: Profile = {
@@ -43,4 +53,12 @@ export const DEFAULT_CONFIG: SynapseConfig = {
   profiles: {
     default: DEFAULT_PROFILE,
   },
+};
+
+/**
+ * Default model
+ */
+export const DEFAULT_MODEL: Model = {
+  provider: 'anthropic',
+  modelStr: 'claude-3-7-sonnet-latest',
 };

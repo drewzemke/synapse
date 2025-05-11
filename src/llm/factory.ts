@@ -2,27 +2,13 @@
  * Factory for creating LLM providers
  */
 
-import { AnthropicProvider } from './providers/anthropic';
-import type { LLMOptions, LLMProvider } from './types';
+import { createAnthropic } from '@ai-sdk/anthropic';
+import type { LanguageModel } from 'ai';
+import { LLM } from '.';
+import type { Model } from '../config';
 
-/**
- * Supported LLM provider types
- */
-export type ProviderType = 'anthropic' | 'openai' | 'mistral'; // Add more as needed
-
-/**
- * Configuration for creating an LLM provider
- */
-export interface LLMConfig {
-  /** Type of provider to create */
-  provider: ProviderType;
-  /** API key for the provider */
-  apiKey: string;
-  /** Model to use */
-  model?: string;
-  /** Additional provider-specific options */
-  options?: Record<string, unknown>;
-}
+// TODO: move this elsewhere
+export type ProviderType = 'anthropic' | 'openai'; // Add more as needed
 
 /**
  * Get the API key from environment variables based on provider type
@@ -33,7 +19,6 @@ export function getApiKeyFromEnv(provider: ProviderType): string | undefined {
   const envVarMap: Record<ProviderType, string> = {
     anthropic: 'ANTHROPIC_API_KEY',
     openai: 'OPENAI_API_KEY',
-    mistral: 'MISTRAL_API_KEY',
   };
 
   const envVar = envVarMap[provider];
@@ -41,46 +26,14 @@ export function getApiKeyFromEnv(provider: ProviderType): string | undefined {
 }
 
 /**
- * Create an LLM provider based on configuration
- * @param config Provider configuration
- * @returns An LLM provider instance
- */
-export function createLLMProvider(config: LLMConfig): LLMProvider {
-  const { provider, apiKey, model, options } = config;
-
-  // Common options for all providers
-  const commonOptions: LLMOptions = {
-    apiKey,
-    model: model || '', // Default model will be set by the provider
-    ...options,
-  };
-
-  switch (provider) {
-    case 'anthropic':
-      return new AnthropicProvider(commonOptions);
-
-    // Add more providers here as they're implemented
-    // case 'openai':
-    //   return new OpenAIProvider(commonOptions);
-
-    default:
-      throw new Error(`Unsupported LLM provider: ${provider}`);
-  }
-}
-
-/**
  * Create an LLM provider using environment variables for configuration
  * @param provider The provider type to create
  * @param model Optional model name to use
- * @param options Additional provider-specific options
  * @returns An LLM provider instance
  * @throws Error if the required API key is not found in environment variables
  */
-export function createLLMProviderFromEnv(
-  provider: ProviderType,
-  model?: string,
-  options?: Record<string, unknown>,
-): LLMProvider {
+export function createLLMFromEnv(modelSpec: Model): LLM {
+  const { provider, modelStr } = modelSpec;
   const apiKey = getApiKeyFromEnv(provider);
 
   if (!apiKey) {
@@ -96,10 +49,22 @@ export function createLLMProviderFromEnv(
     );
   }
 
-  return createLLMProvider({
-    provider,
-    apiKey,
-    model,
-    options,
-  });
+  let model: LanguageModel;
+
+  switch (provider) {
+    case 'anthropic': {
+      const anthropic = createAnthropic({ apiKey });
+      model = anthropic(modelStr);
+      break;
+    }
+
+    // Add more providers here as they're implemented
+    // case 'openai':
+    //   ...
+
+    default:
+      throw new Error(`Unsupported LLM provider: ${provider}`);
+  }
+
+  return new LLM(model);
 }

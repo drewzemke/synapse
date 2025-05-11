@@ -52,6 +52,7 @@
   - [x] Configuration management tests
   - [x] LLM connection tests (with mocks)
 - [x] Set up test automation
+- [ ] Re-add tests for `factory.ts` and add `integration.spec.ts`
 
 ## Phase 5: Enhanced Input Methods
 *Deliverable: Support for piped input and file processing*
