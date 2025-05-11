@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/drewzemke/synapse/compare/v1.5.0...v1.6.0) (2025-05-11)
+
+
+### Features
+
+* **providers:** add bedrock support ([83d518e](https://github.com/drewzemke/synapse/commit/83d518eb142ef185cb8ffb05f62dd27514b77401))
+
 # [1.5.0](https://github.com/drewzemke/synapse/compare/v1.4.0...v1.5.0) (2025-05-11)
 
 
