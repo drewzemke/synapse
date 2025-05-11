@@ -19,7 +19,9 @@ export interface SynapseConfig {
   /** General settings */
   general: {
     /** Whether to stream responses by default */
-    stream: boolean;
+    stream?: boolean;
+    /** The name of the model to use when no other model is specified */
+    default_model?: string;
   };
   /** User-defined profiles */
   profiles?: Record<string, Profile>;

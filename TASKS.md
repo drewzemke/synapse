@@ -39,8 +39,7 @@
   - [x] Implement profile selection from command line
   - [x] Support custom system prompts per profile
   - [x] Support custom temperature
-- [ ] Enhance API key management
-  - [ ] Implement secure storage of API keys in `.api-keys` file
+- [ ] Enable specifying default profile at top level of `config.toml`
 - [x] Update documentation with configuration instructions
 
 ## Phase 4: Testing Framework
@@ -110,7 +109,7 @@
 - [x] Add support for OpenAI
 - [x] Add support for OpenRouter
 - [x] Create provider selection mechanism via `models` section in config
-- [ ] Enable specifying default model at top level of `config.toml`
+- [x] Enable specifying default model at top level of `config.toml`
 - [x] Enable specifying model via `-m/--model` in CLI
 - [x] Update documentation with provider-specific instructions (namely which API key to use)
 - [ ] Add error handling for missing or incorrectly specified models

@@ -101,7 +101,7 @@ export class ConfigManager {
 
     // If the user requested a profile that they have not defined, throw an error
     if (!this.config.profiles?.[profileName]) {
-      throw new Error('Profile does not exist');
+      throw new Error(`Profile '${profileName}' not found`);
     }
 
     return this.config.profiles[profileName];
@@ -124,7 +124,7 @@ export class ConfigManager {
 
     // If the user requested a model that they have not defined, throw an error
     if (!this.config.models?.[modelName]) {
-      throw new Error('Model does not exist');
+      throw new Error(`Model '${modelName}' not found`);
     }
 
     return this.config.models[modelName];
@@ -158,6 +158,13 @@ export class ConfigManager {
       ) {
         if ('stream' in parsedConfig.general && typeof parsedConfig.general.stream === 'boolean') {
           result.general.stream = parsedConfig.general.stream;
+        }
+
+        if (
+          'default_model' in parsedConfig.general &&
+          typeof parsedConfig.general.default_model === 'string'
+        ) {
+          result.general.default_model = parsedConfig.general.default_model;
         }
       }
 

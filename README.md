@@ -89,6 +89,8 @@ The directory will be created automatically on first run if it doesn't exist.
 # General settings
 [general]
 stream = true  # Whether to stream responses by default
+
+default_model = 'claude'  # Which model (defined in the `models` section; see below) to default to
 ```
 
 ### Profiles Configuration

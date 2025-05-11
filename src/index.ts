@@ -79,19 +79,24 @@ async function main() {
 
     // Create LLM provider from environment variables
     try {
+      const config = configManager.getConfig();
+
+      // Get the specified profile (or default if none specified)
+      const profileName = args.profile;
+      const profile = configManager.getProfile(profileName);
+
       // Get the specified model (or default if none specified)
       let model: ModelSpec;
       if (args.model) {
         // If a model is specified via command line, get it from config
         model = configManager.getModel(args.model);
+      } else if (config.general.default_model) {
+        // Try using the default model specfied in the config
+        model = configManager.getModel(config.general.default_model);
       } else {
         // Otherwise use the default model
         model = DEFAULT_MODEL;
       }
-
-      // Get the specified profile (or default if none specified)
-      const profileName = args.profile;
-      const profile = configManager.getProfile(profileName);
 
       // Create LLM provider with options from profile
       const llm = createLLMFromEnv(model);
@@ -119,7 +124,6 @@ async function main() {
       }
 
       // Get streaming preference from config
-      const config = configManager.getConfig();
       const shouldStream = config.general.stream;
 
       // Initialize conversation

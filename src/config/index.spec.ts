@@ -182,7 +182,9 @@ describe('ConfigManager', () => {
     const configManager = new ConfigManager();
     configManager.loadConfig();
 
-    expect(() => configManager.getProfile('nonexistent')).toThrow('Profile does not exist');
+    expect(() => configManager.getProfile('nonexistent')).toThrow(
+      "Profile 'nonexistent' not found",
+    );
   });
 
   it('should return built-in default profile when no profiles exist', () => {
@@ -321,7 +323,7 @@ describe('ConfigManager', () => {
       const configManager = new ConfigManager();
       configManager.loadConfig();
 
-      expect(() => configManager.getModel('nonexistent')).toThrow('Model does not exist');
+      expect(() => configManager.getModel('nonexistent')).toThrow("Model 'nonexistent' not found");
     });
 
     // Validation: invalid provider
