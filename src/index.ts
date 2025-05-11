@@ -7,7 +7,7 @@
 
 import { parseArgs } from './cli/args';
 import { createPromptWithPipedInput } from './cli/piped-prompt';
-import { DEFAULT_MODEL_ANTHROPIC as DEFAULT_MODEL, configManager } from './config';
+import { DEFAULT_MODEL_ANTHROPIC as DEFAULT_MODEL, type ModelSpec, configManager } from './config';
 import {
   type Conversation,
   addMessageToConversation,
@@ -79,8 +79,15 @@ async function main() {
 
     // Create LLM provider from environment variables
     try {
-      // TODO: get the model from the user's configuration
-      const model = DEFAULT_MODEL;
+      // Get the specified model (or default if none specified)
+      let model: ModelSpec;
+      if (args.model) {
+        // If a model is specified via command line, get it from config
+        model = configManager.getModel(args.model);
+      } else {
+        // Otherwise use the default model
+        model = DEFAULT_MODEL;
+      }
 
       // Get the specified profile (or default if none specified)
       const profileName = args.profile;

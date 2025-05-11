@@ -111,8 +111,9 @@
 - [x] Add support for OpenRouter
 - [x] Create provider selection mechanism via `models` section in config
 - [ ] Enable specifying default model at top level of `config.toml`
-- [ ] Enable specifying model via `-m/--model` in CLI
+- [x] Enable specifying model via `-m/--model` in CLI
 - [x] Update documentation with provider-specific instructions (namely which API key to use)
+- [ ] Add error handling for missing or incorrectly specified models
 - [ ] Add support for AWS Bedrock
 
 ## Phase 9: Polish and Distribution

@@ -106,6 +106,43 @@ describe('Command Line Argument Parsing', () => {
     expect(args.verbose).toBe(true);
   });
 
+  // Test model selection option
+  it('should recognize the -m/--model flag', () => {
+    // Test with short form
+    const shortArgs = parseArgs(['-m', 'openai-gpt4', 'What is JavaScript?']);
+    expect(shortArgs.model).toBe('openai-gpt4');
+    expect(shortArgs._).toEqual(['What is JavaScript?']);
+
+    // Test with long form
+    const longArgs = parseArgs(['--model', 'claude-3-7', 'What is TypeScript?']);
+    expect(longArgs.model).toBe('claude-3-7');
+    expect(longArgs._).toEqual(['What is TypeScript?']);
+  });
+
+  // Test model selection with other options
+  it('should handle model selection with other options', () => {
+    const args = parseArgs(['-p', 'coding', '-m', 'openai-gpt4', '-v', 'Explain promises in JS']);
+    expect(args.model).toBe('openai-gpt4');
+    expect(args.profile).toBe('coding');
+    expect(args.verbose).toBe(true);
+    expect(args._).toEqual(['Explain promises in JS']);
+  });
+
+  // Test model selection with extend option
+  it('should allow model selection with extend flag', () => {
+    const args = parseArgs(['-m', 'claude-3-7', '-e', 'Can you elaborate?']);
+    expect(args.model).toBe('claude-3-7');
+    expect(args.extend).toBe(true);
+    expect(args._).toEqual(['Can you elaborate?']);
+  });
+
+  // Test that model selection cannot be used with the last flag
+  it('should throw an error when model is used with last flag', () => {
+    const consoleErrorMock = vi.spyOn(console, 'error').mockImplementation(() => {});
+    expect(() => parseArgs(['-l', '-m', 'openai-gpt4'])).toThrow();
+    consoleErrorMock.mockRestore();
+  });
+
   // Failure case: non-string values in positional arguments get converted to strings
   it('should convert non-string values in _ array to strings', () => {
     // We're directly manipulating the args array to simulate numbers coming in

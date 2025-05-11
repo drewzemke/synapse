@@ -12,6 +12,7 @@ export interface SynapseArgs {
   $0: string;
   prompt?: string;
   profile?: string;
+  model?: string;
   chat?: boolean;
   verbose?: boolean;
   extend?: boolean;
@@ -35,6 +36,11 @@ export function parseArgs(args: string[]): SynapseArgs {
       type: 'string',
       describe: 'Use a specific profile for this query',
     })
+    .option('model', {
+      alias: 'm',
+      type: 'string',
+      describe: 'Use a specific model for this query',
+    })
     .option('chat', {
       alias: 'c',
       type: 'boolean',
@@ -56,10 +62,11 @@ export function parseArgs(args: string[]): SynapseArgs {
       describe: 'Show the last response from the LLM',
     })
     .conflicts({
-      last: ['profile', 'extend'],
+      last: ['profile', 'extend', 'model'],
     })
     .example('$0 "What is a binary tree?"', 'Send a simple query to the LLM')
-    .example('$0 -p coding "Explain recursion"', 'Use the coding profile for a query')
+    .example('$0 -p coding "Explain recursion"', 'Use a pre-configured profile for a query')
+    .example('$0 -m gpt4 "Explain promises in JS"', 'Use a pre-configured model for a query')
     .example('$0 -e "Can you give me an example?"', 'Continue the previous conversation')
     .example('cat main.ts | $0 "Explain this code"', 'Pipe content as context for the query')
     .example('$0 -l', 'Show the last response from the LLM')

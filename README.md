@@ -36,10 +36,16 @@ sy "What is a binary tree?"
 sy -p coding "Explain recursion"
 
 # Use a specific model defined in your config
-sy -m openai-gpt4 "Compare GPT-4 with Claude"
+sy -m gpt4 "Compare GPT-4 with Claude"
+
+# Mix and match profiles with different models
+sy -p coding -m gpt4 "Explain promises in JavaScript"
 
 # Continue the previous conversation
 sy -e "Can you provide an example?"
+
+# Continue a conversation using a specific model
+sy -e -m claude "Can you elaborate on that?"
 
 # Show the last response from the LLM
 sy -l
