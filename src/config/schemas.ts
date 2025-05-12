@@ -57,10 +57,10 @@ export const SynapseConfigSchema = z
     general: z
       .object({
         /** Whether to stream responses by default */
-        stream: z.boolean().default(true).optional(),
+        stream: z.boolean().default(true),
 
         /** The name of the profile to use when no profile is specified */
-        default_profile: z.string().default('default').optional(),
+        default_profile: z.string().default('default'),
 
         /** The name of the model to use when no model is specified */
         default_model: z.string().optional(),
