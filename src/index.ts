@@ -6,6 +6,7 @@
  */
 
 import { parseArgs } from './cli/args';
+import { colorCodeBlocks } from './cli/color';
 import { createPromptWithPipedInput } from './cli/piped-prompt';
 import { DEFAULT_MODEL_ANTHROPIC as DEFAULT_MODEL, type ModelSpec, configManager } from './config';
 import {
@@ -29,7 +30,7 @@ function loadConfiguration() {
   }
 }
 
-function printLastMessage() {
+function printLastMessage(color: boolean) {
   const lastConversation = loadLastConversation();
 
   if (!lastConversation || lastConversation.messages.length === 0) {
@@ -44,7 +45,12 @@ function printLastMessage() {
     return;
   }
 
-  console.log(assistantMessages[assistantMessages.length - 1].content);
+  const content = assistantMessages[assistantMessages.length - 1].content;
+  if (color) {
+    console.log(colorCodeBlocks(content));
+  } else {
+    console.log(content);
+  }
 }
 
 async function main() {
@@ -60,7 +66,7 @@ async function main() {
     }
 
     if (args.last) {
-      printLastMessage();
+      printLastMessage(args.color ?? false);
       return;
     }
 
@@ -163,7 +169,11 @@ async function main() {
       } else {
         // Generate the full response using the conversation messages
         assistantResponse = await llm.generateText(conversation.messages);
-        console.log(assistantResponse);
+        if (args.color) {
+          console.log(colorCodeBlocks(assistantResponse));
+        } else {
+          console.log(assistantResponse);
+        }
       }
 
       // Add assistant's response to conversation

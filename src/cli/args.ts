@@ -17,6 +17,7 @@ export interface SynapseArgs {
   verbose?: boolean;
   extend?: boolean;
   last?: boolean;
+  color?: boolean;
 }
 
 /**
@@ -41,11 +42,6 @@ export function parseArgs(args: string[]): SynapseArgs {
       type: 'string',
       describe: 'Use a specific model for this query',
     })
-    .option('chat', {
-      alias: 'c',
-      type: 'boolean',
-      describe: 'Start an interactive chat session',
-    })
     .option('verbose', {
       alias: 'v',
       type: 'boolean',
@@ -61,6 +57,16 @@ export function parseArgs(args: string[]): SynapseArgs {
       type: 'boolean',
       describe: 'Show the last response from the LLM',
     })
+    .option('color', {
+      alias: 'C',
+      type: 'boolean',
+      describe: 'Try to output code blocks with syntax highlighting (experimental)',
+    })
+    // .option('chat', {
+    //   alias: 'c',
+    //   type: 'boolean',
+    //   describe: 'Start an interactive chat session',
+    // })
     .conflicts({
       last: ['profile', 'extend', 'model'],
     })

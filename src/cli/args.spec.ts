@@ -23,12 +23,11 @@ describe('Command Line Argument Parsing', () => {
 
   // Test with long-form options
   it('should parse long-form options correctly', () => {
-    const args = parseArgs(['--profile', 'programming', '--chat', 'How do I configure tailwind?']);
+    const args = parseArgs(['--profile', 'programming', 'How do I configure tailwind?']);
 
     expect(args).toMatchObject({
       _: ['How do I configure tailwind?'],
       profile: 'programming',
-      chat: true,
     });
   });
 
