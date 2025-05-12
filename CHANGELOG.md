@@ -1,3 +1,15 @@
+# [1.7.0](https://github.com/drewzemke/synapse/compare/v1.6.1...v1.7.0) (2025-05-12)
+
+
+### Bug Fixes
+
+* **config:** load default values correctly ([0526e84](https://github.com/drewzemke/synapse/commit/0526e84aeddf52aaa68a6cdda7822516cddf765e))
+
+
+### Features
+
+* **color:** add (experimental) code coloring to llm output ([7bc10be](https://github.com/drewzemke/synapse/commit/7bc10becd1c0d648c0e47c71b39d77620e09a888))
+
 ## [1.6.1](https://github.com/drewzemke/synapse/compare/v1.6.0...v1.6.1) (2025-05-11)
 
 
