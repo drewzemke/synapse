@@ -148,3 +148,4 @@
   - [ ] add line numbers?
 - [ ] Add an MCP tool that lets the chat put stuff in the user's clipboard
 - [x] refactor to use zod for config validation
+- [ ] add `--no-stream` option to disable streaming
