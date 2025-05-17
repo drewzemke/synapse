@@ -148,4 +148,4 @@
   - [x] automatically disable coloring when no terminal output is detected
 - [ ] Add an MCP tool that lets the chat put stuff in the user's clipboard
 - [x] refactor to use zod for config validation
-- [ ] add `--no-stream` option to disable streaming
+- [x] add `--no-stream` option to disable streaming

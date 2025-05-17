@@ -66,7 +66,11 @@ async function main() {
     // so this has the effect of prioritizing whichever of the two
     // args the user has passed, falling back to the config (which itself
     // defaults to false if not set)
-    const useColor = process.stdout.isTTY && (args.color ?? args.noColor ?? config.general.color);
+    const printColor = process.stdout.isTTY && (args.color ?? args.noColor ?? config.general.color);
+
+    // same as above
+    const streamOutput =
+      process.stdout.isTTY && (args.stream ?? args.noStream ?? config.general.stream);
 
     if (args.verbose) {
       console.log('Synapse CLI initialized');
@@ -74,7 +78,7 @@ async function main() {
     }
 
     if (args.last) {
-      printLastMessage(useColor);
+      printLastMessage(printColor);
       return;
     }
 
@@ -132,14 +136,13 @@ async function main() {
         console.log(`Using model: ${model.modelStr}`);
         console.log(`Using profile: ${profileName || '<none>'}`);
         console.log(`Profile temperature: ${profile.temperature}`);
-        console.log(`Code coloring: ${useColor ? 'on' : 'off'}`);
+        console.log(`Code coloring: ${printColor ? 'on' : 'off'}`);
+        console.log(`Response streaming: ${streamOutput ? 'on' : 'off'}`);
         if (args.extend) {
           console.log('Continuing previous conversation');
         }
         console.log('\nResponse:');
       }
-
-      const shouldStream = config.general.stream;
 
       // initialize conversation
       let conversation: Conversation;
@@ -164,8 +167,8 @@ async function main() {
 
       let assistantResponse = '';
 
-      if (shouldStream) {
-        if (useColor) {
+      if (streamOutput) {
+        if (printColor) {
           assistantResponse = await streamWithCodeColor(llm, conversation);
         } else {
           // normal streaming, no color
@@ -178,7 +181,7 @@ async function main() {
       } else {
         // generate the full response without streaming
         assistantResponse = await llm.generateText(conversation.messages);
-        if (useColor) {
+        if (printColor) {
           console.log(colorCodeBlocks(assistantResponse));
         } else {
           console.log(assistantResponse);

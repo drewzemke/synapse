@@ -19,6 +19,8 @@ export interface SynapseArgs {
   last?: boolean;
   color?: boolean;
   noColor?: boolean;
+  stream?: boolean;
+  noStream?: boolean;
 }
 
 /**
@@ -61,16 +63,26 @@ export function parseArgs(args: string[]): SynapseArgs {
     .option('color', {
       alias: 'C',
       type: 'boolean',
-      describe: 'Try to output code blocks with syntax highlighting (experimental)',
+      describe: 'Beautify code blocks with syntax highlighting',
     })
     .option('no-color', {
       type: 'boolean',
       describe: 'Disable color output',
     })
+    .option('stream', {
+      alias: 's',
+      type: 'boolean',
+      describe: "Stream output to the console as it's received from the LLM",
+    })
+    .option('no-stream', {
+      type: 'boolean',
+      describe: 'Print all of the output after the LLM has finished generating',
+    })
     .conflicts({
       last: ['profile', 'extend', 'model'],
       // FIXME: this doesn't seem to work :(
       color: 'no-color',
+      stream: 'no-stream',
     })
     .example('$0 "What is a binary tree?"', 'Send a simple query to the LLM')
     .example('$0 -p coding "Explain recursion"', 'Use a pre-configured profile for a query')
