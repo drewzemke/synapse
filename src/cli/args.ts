@@ -18,6 +18,7 @@ export interface SynapseArgs {
   extend?: boolean;
   last?: boolean;
   color?: boolean;
+  noColor?: boolean;
 }
 
 /**
@@ -62,13 +63,14 @@ export function parseArgs(args: string[]): SynapseArgs {
       type: 'boolean',
       describe: 'Try to output code blocks with syntax highlighting (experimental)',
     })
-    // .option('chat', {
-    //   alias: 'c',
-    //   type: 'boolean',
-    //   describe: 'Start an interactive chat session',
-    // })
+    .option('no-color', {
+      type: 'boolean',
+      describe: 'Disable color output',
+    })
     .conflicts({
       last: ['profile', 'extend', 'model'],
+      // FIXME: this doesn't seem to work :(
+      color: 'no-color',
     })
     .example('$0 "What is a binary tree?"', 'Send a simple query to the LLM')
     .example('$0 -p coding "Explain recursion"', 'Use a pre-configured profile for a query')

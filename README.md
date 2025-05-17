@@ -93,6 +93,9 @@ The directory will be created automatically on first run if it doesn't exist.
 # Whether to stream responses by default (default true)
 stream = true
 
+# Whether to output code blocks with fancy styling and color (default false)
+color = true
+
 # Which profile to use by default (default undefined)
 default_profile = 'base'
 

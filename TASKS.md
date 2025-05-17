@@ -141,11 +141,11 @@
   - [x] Ensure flag conflicts with profile/extend flags
   - [x] Retrieve and display last assistant message
   - [x] Add unit tests
-- [ ] Code coloring when outputting to terminal?
-  - [ ] detect when code blocks start
-  - [ ] use highlightjs or prismjs to color input
-  - [ ] do some terminal manip to get it so that the code block gets redrawn after every chunk comes in, so the colors aren't weird from incomplete data
-  - [ ] add line numbers?
+- [x] Code coloring when outputting to terminal?
+  - [x] detect when code blocks start
+  - [x] use highlightjs or prismjs to color input
+  - [x] do some terminal manip to get it so that the code block gets redrawn after every chunk comes in, so the colors aren't weird from incomplete data
+  - [x] automatically disable coloring when no terminal output is detected
 - [ ] Add an MCP tool that lets the chat put stuff in the user's clipboard
 - [x] refactor to use zod for config validation
 - [ ] add `--no-stream` option to disable streaming

@@ -59,6 +59,9 @@ export const SynapseConfigSchema = z
         /** Whether to stream responses by default */
         stream: z.boolean().default(true),
 
+        /** Whether to use code coloring by default */
+        color: z.boolean().default(false),
+
         /** The name of the profile to use when no profile is specified */
         default_profile: z.string().default('default'),
 

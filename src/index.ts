@@ -60,6 +60,13 @@ async function main() {
 
     // Load configuration
     loadConfiguration();
+    const config = configManager.getConfig();
+
+    // args.color and args.noColor will never be set at the same time,
+    // so this has the effect of prioritizing whichever of the two
+    // args the user has passed, falling back to the config (which itself
+    // defaults to false if not set)
+    const useColor = process.stdout.isTTY && (args.color ?? args.noColor ?? config.general.color);
 
     if (args.verbose) {
       console.log('Synapse CLI initialized');
@@ -67,7 +74,7 @@ async function main() {
     }
 
     if (args.last) {
-      printLastMessage(args.color ?? false);
+      printLastMessage(useColor);
       return;
     }
 
@@ -87,8 +94,6 @@ async function main() {
 
     // Create LLM provider from environment variables
     try {
-      const config = configManager.getConfig();
-
       // Get the specified profile (or default if none specified)
       // TODO: refactor some of this to be in the config manager
       const profileName = args.profile;
@@ -127,6 +132,7 @@ async function main() {
         console.log(`Using model: ${model.modelStr}`);
         console.log(`Using profile: ${profileName || '<none>'}`);
         console.log(`Profile temperature: ${profile.temperature}`);
+        console.log(`Code coloring: ${useColor ? 'on' : 'off'}`);
         if (args.extend) {
           console.log('Continuing previous conversation');
         }
@@ -159,7 +165,7 @@ async function main() {
       let assistantResponse = '';
 
       if (shouldStream) {
-        if (args.color) {
+        if (useColor) {
           assistantResponse = await streamWithCodeColor(llm, conversation);
         } else {
           // normal streaming, no color
@@ -172,7 +178,7 @@ async function main() {
       } else {
         // generate the full response without streaming
         assistantResponse = await llm.generateText(conversation.messages);
-        if (args.color) {
+        if (useColor) {
           console.log(colorCodeBlocks(assistantResponse));
         } else {
           console.log(assistantResponse);
