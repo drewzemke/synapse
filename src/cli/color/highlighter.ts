@@ -5,6 +5,8 @@ import { refractor } from 'refractor/all';
 
 const DEBUG_MISSING_CLASSES = false;
 
+export const FALLBACK_LANGUAGE = 'plaintext';
+
 type TaggedToken = [token: string, classes: Set<string>];
 
 function flattenHast(node: Root | RootContent): Array<TaggedToken> {
@@ -157,31 +159,44 @@ function colorizeToken([token, classes]: TaggedToken): string {
   return token;
 }
 
-// For rounding corners at top and bottom
-// const TOP_LEFT = '╭';
-// const TOP_RIGHT = '╮';
-// const BOTTOM_LEFT = '╰';
-// const BOTTOM_RIGHT = '╯';
-const TOP_LEFT = '─';
-const TOP_RIGHT = '─';
-const BOTTOM_LEFT = '─';
-const BOTTOM_RIGHT = '─';
+const TOP_LEFT = '╭';
+const TOP_RIGHT = '╮';
+const BOTTOM_LEFT = '╰';
+const BOTTOM_RIGHT = '╯';
 const HORIZONTAL = '─';
+const VERTICAL = '│';
+
+const LANGUAGE_NAME_INDENT = 1;
 
 const terminalWidth = stdout.columns;
 
-function formatCodeBlock(code: string, language: string): string {
-  // Calculate how much space we need on each side of the language name
-  const paddingSize = Math.max(0, Math.floor((terminalWidth - language.length - 4) / 2));
+function formatCodeBlock(coloredCode: string, uncoloredCode: string, language: string): string {
+  //  top border with language name
+  const topLeftPadding = HORIZONTAL.repeat(LANGUAGE_NAME_INDENT);
+  const topRightPadding = HORIZONTAL.repeat(
+    terminalWidth - topLeftPadding.length - language.length - 4,
+  );
 
-  //  top border with language centered
-  const leftPadding = HORIZONTAL.repeat(paddingSize);
-  const rightPadding = HORIZONTAL.repeat(terminalWidth - paddingSize - language.length - 4);
+  const topBorder =
+    language === FALLBACK_LANGUAGE
+      ? `${TOP_LEFT}${HORIZONTAL.repeat(terminalWidth - 2)}${TOP_RIGHT}`
+      : `${TOP_LEFT}${topLeftPadding} ${language} ${topRightPadding}${TOP_RIGHT}`;
 
-  const topBorder = `${TOP_LEFT}${leftPadding} ${language} ${rightPadding}${TOP_RIGHT}`;
   const bottomBorder = `${BOTTOM_LEFT}${HORIZONTAL.repeat(terminalWidth - 2)}${BOTTOM_RIGHT}`;
 
-  return `${topBorder}\n${code}${bottomBorder}`;
+  // for each line, add a vertical line on the left and right sides of the terminal
+  const uncoloredLineLengths = uncoloredCode.split('\n').map((l) => l.length);
+  const formattedCode = coloredCode
+    .trim()
+    .split('\n')
+    .map((line, idx) => {
+      const codeLength = uncoloredLineLengths[idx];
+      const spaces = ' '.repeat(terminalWidth - codeLength - 2);
+      return `${chalk.gray(VERTICAL)}${line}${spaces}${chalk.gray(VERTICAL)}`;
+    })
+    .join('\n');
+
+  return `${chalk.gray(topBorder)}\n${formattedCode}${chalk.gray(bottomBorder)}`;
 }
 
 export function highlight(code: string, language: string): string {
@@ -191,7 +206,7 @@ export function highlight(code: string, language: string): string {
 
   const coloredCode = flattenedNodes.map(colorizeToken).join('');
 
-  const fullCode = formatCodeBlock(coloredCode, language);
+  const fullCode = formatCodeBlock(coloredCode, code, language);
 
   return fullCode;
 }
