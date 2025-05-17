@@ -6,13 +6,15 @@ import { FALLBACK_LANGUAGE, highlight } from './highlighter';
 const CODE_BLOCK_START_REGEX = /\`\`\`(\w*)?\n/;
 const CODE_BLOCK_END_REGEX = /\`\`\`\s*$/;
 
-/**
- * stream text from LLM with code block highlighting
+function hideCursor() {
+  process.stdout.write(ansiEscapes.cursorHide);
+}
 
- * @param llm The language model client
- * @param conversation The conversation to stream from
- */
-export async function streamWithCodeColor(llm: LLM, conversation: Conversation): Promise<string> {
+function showCursor() {
+  process.stdout.write(ansiEscapes.cursorShow);
+}
+
+async function streamWithCodeColorInner(llm: LLM, conversation: Conversation): Promise<string> {
   let rawResponse = '';
 
   let buffer = '';
@@ -57,6 +59,7 @@ export async function streamWithCodeColor(llm: LLM, conversation: Conversation):
         // after the code block that the LLM always puts
         process.stdout.write('\n\n');
 
+        showCursor();
         codeBuffer = '';
 
         // print the remaining chunk after the code block end
@@ -85,6 +88,7 @@ export async function streamWithCodeColor(llm: LLM, conversation: Conversation):
         buffer = '';
 
         // initial render of the code block (may be empty at first)
+        hideCursor();
         renderCode();
       } else {
         // proceed normally
@@ -99,4 +103,21 @@ export async function streamWithCodeColor(llm: LLM, conversation: Conversation):
   }
 
   return rawResponse;
+}
+
+/**
+ * stream text from LLM with code block highlighting
+
+ * @param llm The language model client
+ * @param conversation The conversation to stream from
+ */
+export async function streamWithCodeColor(llm: LLM, conversation: Conversation): Promise<string> {
+  let response: string;
+  try {
+    response = await streamWithCodeColorInner(llm, conversation);
+  } finally {
+    // show the cursor in case we crashed while it was hidden
+    showCursor();
+  }
+  return response;
 }
