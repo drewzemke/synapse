@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/drewzemke/synapse/compare/v1.7.0...v1.8.0) (2025-05-17)
+
+
+### Features
+
+* **color:** improved highlighting algorithm, covering more classes, and better code block formatting ([3dec867](https://github.com/drewzemke/synapse/commit/3dec867b373a5421af7cfd3d4babe37aaba2abc1))
+
 # [1.7.0](https://github.com/drewzemke/synapse/compare/v1.6.1...v1.7.0) (2025-05-12)
 
 
