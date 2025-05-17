@@ -113,12 +113,12 @@ function colorizerForClass(cls: Class): ChalkInstance {
     case 'function':
     case 'macro':
     case 'function-definition':
-      return chalk.green;
+      return chalk.blue;
     case 'string':
     case 'template-string':
-      return chalk.yellow;
+      return chalk.green;
     case 'number':
-      return chalk.blue;
+      return chalk.yellow;
     case 'class-name':
       return chalk.cyan;
     case 'operator':
@@ -134,18 +134,18 @@ function colorizerForClass(cls: Class): ChalkInstance {
     case 'attr-name':
       return chalk.blue;
     case 'attr-value':
-      return chalk.yellow;
+      return chalk.green;
     case 'boolean':
-      return chalk.blue;
+      return chalk.yellow;
     case 'string-interpolation':
     case 'interpolation':
       return chalk.blue;
     case 'symbol':
-      return chalk.blue;
+      return chalk.red;
     case 'hvariable':
       return chalk.green;
     case 'constant':
-      return chalk.blue;
+      return chalk.yellow;
   }
 }
 

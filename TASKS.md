@@ -146,6 +146,8 @@
   - [x] use highlightjs or prismjs to color input
   - [x] do some terminal manip to get it so that the code block gets redrawn after every chunk comes in, so the colors aren't weird from incomplete data
   - [x] automatically disable coloring when no terminal output is detected
+  - [x] update coloring theme to something that looks good everywhere (use `base16` theme?)
 - [ ] Add an MCP tool that lets the chat put stuff in the user's clipboard
 - [x] refactor to use zod for config validation
 - [x] add `--no-stream` option to disable streaming
+- [ ] add a spinner while waiting for first response
