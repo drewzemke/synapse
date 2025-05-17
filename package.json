@@ -23,7 +23,7 @@
   "keywords": ["cli", "llm", "ai", "chat", "anthropic", "claude"],
   "author": "",
   "license": "MIT",
-  "packageManager": "pnpm@10.10.0",
+  "packageManager": "pnpm@10.11.0",
   "dependencies": {
     "@ai-sdk/amazon-bedrock": "^2.2.9",
     "@ai-sdk/anthropic": "^1.2.10",
@@ -31,6 +31,7 @@
     "@aws-sdk/credential-providers": "^3.806.0",
     "@openrouter/ai-sdk-provider": "^0.4.5",
     "ai": "^4.3.13",
+    "ansi-escapes": "^7.0.0",
     "chalk": "^5.4.1",
     "refractor": "^5.0.0",
     "toml": "^3.0.0",

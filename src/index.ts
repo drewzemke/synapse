@@ -7,6 +7,7 @@
 
 import { parseArgs } from './cli/args';
 import { colorCodeBlocks } from './cli/color';
+import { streamWithCodeColor } from './cli/color/stream';
 import { createPromptWithPipedInput } from './cli/piped-prompt';
 import { DEFAULT_MODEL_ANTHROPIC as DEFAULT_MODEL, type ModelSpec, configManager } from './config';
 import {
@@ -116,7 +117,7 @@ async function main() {
       // Check for and combine with any piped input
       const prompt = await createPromptWithPipedInput(basePrompt);
 
-      // Show diagnostic information in verbose mode
+      // show diagnostic information in verbose mode
       if (args.verbose) {
         console.log(`Processing prompt: "${basePrompt}"\n`);
         if (prompt !== basePrompt) {
@@ -132,26 +133,24 @@ async function main() {
         console.log('\nResponse:');
       }
 
-      // Get streaming preference from config
       const shouldStream = config.general.stream;
 
-      // Initialize conversation
+      // initialize conversation
       let conversation: Conversation;
 
       if (args.extend) {
-        // Continue previous conversation
         conversation = continueConversation(prompt);
       } else {
-        // Create a new conversation
+        // create a new conversation
         conversation = {
           profile: profileName ?? 'default',
           temperature: profile.temperature,
           messages: [
-            // Add system message if present
+            // system message if present
             ...(profile.system_prompt
               ? [{ role: 'system' as const, content: profile.system_prompt }]
               : []),
-            // Add user message
+            // user message
             { role: 'user', content: prompt },
           ],
         };
@@ -160,14 +159,18 @@ async function main() {
       let assistantResponse = '';
 
       if (shouldStream) {
-        // Stream the response using the conversation messages
-        for await (const chunk of llm.streamText(conversation.messages)) {
-          process.stdout.write(chunk);
-          assistantResponse += chunk;
+        if (args.color) {
+          assistantResponse = await streamWithCodeColor(llm, conversation);
+        } else {
+          // normal streaming, no color
+          for await (const chunk of llm.streamText(conversation.messages)) {
+            process.stdout.write(chunk);
+            assistantResponse += chunk;
+          }
         }
-        console.log('\n'); // Add a newline at the end
+        console.log('\n');
       } else {
-        // Generate the full response using the conversation messages
+        // generate the full response without streaming
         assistantResponse = await llm.generateText(conversation.messages);
         if (args.color) {
           console.log(colorCodeBlocks(assistantResponse));
@@ -176,13 +179,11 @@ async function main() {
         }
       }
 
-      // Add assistant's response to conversation
+      // add new response to conversation and save
       conversation = addMessageToConversation(conversation, 'assistant', assistantResponse);
-
-      // Save the conversation
       saveConversation(conversation);
 
-      // Show token usage if available and verbose is enabled
+      // show token usage if available and verbose is enabled
       // TODO: better printing?
       if (args.verbose && llm.getUsage) {
         console.log('------------');
