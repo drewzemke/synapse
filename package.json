@@ -1,6 +1,6 @@
 {
   "name": "@drewzemke/synapse",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Lightweight CLI LLM Interface",
   "repository": {
     "type": "git",

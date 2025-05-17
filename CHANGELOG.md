@@ -1,3 +1,18 @@
+# [1.9.0](https://github.com/drewzemke/synapse/compare/v1.8.0...v1.9.0) (2025-05-17)
+
+
+### Bug Fixes
+
+* **color:** hide cursor while rendering code blocks ([dc1437c](https://github.com/drewzemke/synapse/commit/dc1437c6f245a728b31d4a42956f04e2fd3bb7d9))
+
+
+### Features
+
+* **color:** color code blocks while streaming :) ([1f7c880](https://github.com/drewzemke/synapse/commit/1f7c88097230da5f419470199901ca93d2c7bf21))
+* **color:** print code blocks in boxes ([ce24258](https://github.com/drewzemke/synapse/commit/ce24258d85a75eb318c885a47f3c4544668d44ae))
+* **config:** better control of color output from config and CLI ([66e935d](https://github.com/drewzemke/synapse/commit/66e935dc985439530c5ee1272fb5274742281b1c))
+* **config:** better control of whether the output is streamed ([4d956ab](https://github.com/drewzemke/synapse/commit/4d956ab7331ad13697ab1a4ce818dd6ab329021a))
+
 # [1.8.0](https://github.com/drewzemke/synapse/compare/v1.7.0...v1.8.0) (2025-05-17)
 
 
