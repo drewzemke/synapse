@@ -1,4 +1,4 @@
-import { type Spinner, createSpinner } from 'nanospinner';
+import { createSpinner, type Spinner } from 'nanospinner';
 
 let activeSpinner: Spinner | null = null;
 

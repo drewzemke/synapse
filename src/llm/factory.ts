@@ -8,8 +8,8 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { fromNodeProviderChain } from '@aws-sdk/credential-providers';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import type { LanguageModel } from 'ai';
-import { LLM } from '.';
 import type { ModelSpec } from '../config';
+import { LLM } from '.';
 
 type ProviderNeedingApiKey = Exclude<ModelSpec['provider'], 'bedrock'>;
 

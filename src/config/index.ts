@@ -151,6 +151,6 @@ export class ConfigManager {
 // Export a singleton instance of the config manager
 export const configManager = new ConfigManager();
 
+export * from './schemas';
 // Export types and schemas
 export * from './types';
-export * from './schemas';

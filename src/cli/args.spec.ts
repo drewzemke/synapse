@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { type SynapseArgs, parseArgs } from './args';
+import { parseArgs, type SynapseArgs } from './args';
 
 describe('Command Line Argument Parsing', () => {
   // Test for expected use

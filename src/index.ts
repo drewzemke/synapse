@@ -10,10 +10,10 @@ import { colorCodeBlocks } from './cli/color';
 import { streamWithCodeColor } from './cli/color/stream';
 import { createPromptWithPipedInput } from './cli/piped-prompt';
 import { startSpinner, stopSpinner } from './cli/spinner';
-import { DEFAULT_MODEL_ANTHROPIC as DEFAULT_MODEL, type ModelSpec, configManager } from './config';
+import { configManager, DEFAULT_MODEL_ANTHROPIC as DEFAULT_MODEL, type ModelSpec } from './config';
 import {
-  type Conversation,
   addMessageToConversation,
+  type Conversation,
   continueConversation,
   loadLastConversation,
   saveConversation,

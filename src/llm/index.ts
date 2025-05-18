@@ -2,13 +2,13 @@
  * Main LLM module that exports all LLM-related functionality
  */
 
-import { type LanguageModel, generateText, smoothStream, streamText } from 'ai';
+import { generateText, type LanguageModel, smoothStream, streamText } from 'ai';
 import type { Message } from '../conversation';
 import type { LLMOptions, TokenUsage } from './types';
 
+export * from './factory';
 // Re-export stuff
 export * from './types';
-export * from './factory';
 
 /**
  * The main wrapper around an LLM connection.

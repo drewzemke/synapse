@@ -21,7 +21,14 @@
     "verify": "pnpm check && pnpm lint:fix && pnpm test",
     "semantic-release": "semantic-release"
   },
-  "keywords": ["cli", "llm", "ai", "chat", "anthropic", "claude"],
+  "keywords": [
+    "cli",
+    "llm",
+    "ai",
+    "chat",
+    "anthropic",
+    "claude"
+  ],
   "author": "",
   "license": "MIT",
   "packageManager": "pnpm@10.11.0",
@@ -44,7 +51,7 @@
     "zod-validation-error": "^3.4.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
+    "@biomejs/biome": "2.0.0-beta.4",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^10.0.1",

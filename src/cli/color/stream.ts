@@ -4,8 +4,8 @@ import type { LLM } from '../../llm';
 import { stopSpinner } from '../spinner';
 import { FALLBACK_LANGUAGE, highlight } from './highlighter';
 
-const CODE_BLOCK_START_REGEX = /\`\`\`(\w*)?\n/;
-const CODE_BLOCK_END_REGEX = /\`\`\`\s*$/;
+const CODE_BLOCK_START_REGEX = /```(\w*)?\n/;
+const CODE_BLOCK_END_REGEX = /```\s*$/;
 
 function hideCursor() {
   process.stdout.write(ansiEscapes.cursorHide);
