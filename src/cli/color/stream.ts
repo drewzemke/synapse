@@ -1,6 +1,7 @@
 import * as ansiEscapes from 'ansi-escapes'; // For terminal manipulation
 import type { Conversation } from '../../conversation';
 import type { LLM } from '../../llm';
+import { stopSpinner } from '../spinner';
 import { FALLBACK_LANGUAGE, highlight } from './highlighter';
 
 const CODE_BLOCK_START_REGEX = /\`\`\`(\w*)?\n/;
@@ -16,6 +17,7 @@ function showCursor() {
 
 async function streamWithCodeColorInner(llm: LLM, conversation: Conversation): Promise<string> {
   let rawResponse = '';
+  let firstChunk = true;
 
   let buffer = '';
   let inCodeBlock = false;
@@ -39,6 +41,12 @@ async function streamWithCodeColorInner(llm: LLM, conversation: Conversation): P
   };
 
   for await (const chunk of llm.streamText(conversation.messages)) {
+    // if this is the first chunk, stop the spinner
+    if (firstChunk) {
+      firstChunk = false;
+      stopSpinner();
+    }
+
     rawResponse += chunk;
 
     if (inCodeBlock) {

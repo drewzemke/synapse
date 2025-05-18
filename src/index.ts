@@ -9,6 +9,7 @@ import { parseArgs } from './cli/args';
 import { colorCodeBlocks } from './cli/color';
 import { streamWithCodeColor } from './cli/color/stream';
 import { createPromptWithPipedInput } from './cli/piped-prompt';
+import { startSpinner, stopSpinner } from './cli/spinner';
 import { DEFAULT_MODEL_ANTHROPIC as DEFAULT_MODEL, type ModelSpec, configManager } from './config';
 import {
   type Conversation,
@@ -167,12 +168,20 @@ async function main() {
 
       let assistantResponse = '';
 
+      // TODO: clean this up
       if (streamOutput) {
         if (printColor) {
+          startSpinner();
           assistantResponse = await streamWithCodeColor(llm, conversation);
         } else {
           // normal streaming, no color
+          startSpinner();
+          let firstChunk = true;
           for await (const chunk of llm.streamText(conversation.messages)) {
+            if (firstChunk) {
+              firstChunk = false;
+              stopSpinner();
+            }
             process.stdout.write(chunk);
             assistantResponse += chunk;
           }
@@ -180,7 +189,9 @@ async function main() {
         console.log('\n');
       } else {
         // generate the full response without streaming
+        startSpinner();
         assistantResponse = await llm.generateText(conversation.messages);
+        stopSpinner();
         if (printColor) {
           console.log(colorCodeBlocks(assistantResponse));
         } else {

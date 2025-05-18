@@ -150,4 +150,4 @@
 - [ ] Add an MCP tool that lets the chat put stuff in the user's clipboard
 - [x] refactor to use zod for config validation
 - [x] add `--no-stream` option to disable streaming
-- [ ] add a spinner while waiting for first response
+- [x] add a spinner while waiting for first response
