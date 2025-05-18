@@ -11,13 +11,14 @@
     "sy": "dist/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --format=cjs --minify",
+    "check": "tsc --noEmit",
     "dev": "tsx src/index.ts",
     "lint": "biome check .",
     "lint:fix": "biome check . --fix",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verify": "pnpm lint:fix && pnpm build && pnpm test",
+    "verify": "pnpm check && pnpm lint:fix && pnpm test",
     "semantic-release": "semantic-release"
   },
   "keywords": ["cli", "llm", "ai", "chat", "anthropic", "claude"],
@@ -50,6 +51,7 @@
     "@types/hast": "^3.0.4",
     "@types/node": "^22.15.9",
     "@types/yargs": "^17.0.33",
+    "esbuild": "^0.25.4",
     "semantic-release": "^24.2.3",
     "vitest": "^3.1.3"
   },
