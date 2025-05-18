@@ -1,3 +1,16 @@
+# [1.10.0](https://github.com/drewzemke/synapse/compare/v1.9.0...v1.10.0) (2025-05-18)
+
+
+### Features
+
+* **color:** tweak code coloring ([e491e36](https://github.com/drewzemke/synapse/commit/e491e36e5021c6ce17f9dc3d384983fee8e7f951))
+* **spinner:** show a spinner while waiting for the first output ([b9d3971](https://github.com/drewzemke/synapse/commit/b9d39717b34005f705602a625a131e1570ecc8d0))
+
+
+### Performance Improvements
+
+* build with esbuild for better startup time ([e5ab960](https://github.com/drewzemke/synapse/commit/e5ab960cef6e0e48e04b9afb1d8ad7b4566da41c))
+
 # [1.9.0](https://github.com/drewzemke/synapse/compare/v1.8.0...v1.9.0) (2025-05-17)
 
 
