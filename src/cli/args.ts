@@ -50,6 +50,11 @@ export function parseArgs(args: string[]): SynapseArgs {
       type: 'boolean',
       describe: 'Show verbose output including token usage',
     })
+    .option('chat', {
+      alias: 'c',
+      type: 'boolean',
+      describe: 'Start an interactive chat session',
+    })
     .option('extend', {
       alias: 'e',
       type: 'boolean',
@@ -90,7 +95,8 @@ export function parseArgs(args: string[]): SynapseArgs {
     .example('$0 -e "Can you give me an example?"', 'Continue the previous conversation')
     .example('cat main.ts | $0 "Explain this code"', 'Pipe content as context for the query')
     .example('$0 -l', 'Show the last response from the LLM')
-    // .example('$0 --chat', 'Start an interactive chat session')
+    .example('$0 --chat', 'Start an interactive chat session')
+    .example('$0 --chat "Tell me about React"', 'Start an interactive chat with an initial prompt')
     .epilogue('For more information, visit https://github.com/drewzemke/synapse')
     .help()
     .alias('help', 'h')

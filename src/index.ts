@@ -6,6 +6,7 @@
  */
 
 import { parseArgs } from './cli/args';
+import { startChatSession } from './cli/chat';
 import { colorCodeBlocks } from './cli/color';
 import { streamWithCodeColor } from './cli/color/stream';
 import { createPromptWithPipedInput } from './cli/piped-prompt';
@@ -87,8 +88,12 @@ async function main() {
       if (args.verbose) {
         console.log('Starting chat session...');
       }
-      console.log('Chat functionality not yet implemented.');
-      // TODO: Implement interactive chat session
+
+      // Get the initial prompt if provided
+      const initialPrompt = args.prompt || args._.join(' ');
+
+      // Start the chat session
+      await startChatSession(initialPrompt || undefined, args.extend);
       return;
     }
 

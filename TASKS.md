@@ -92,10 +92,11 @@
 ## Phase 7: Interactive Chat Mode
 *Deliverable: Interactive chat interface with conversation history*
 
-- [ ] Add interactive chat mode
+- [x] Add interactive chat mode -- see [./CHAT_FEATURE.md]
   - [x] Implement conversation history tracking
-  - [ ] Create interactive prompt interface
-  - [ ] Support multi-turn conversations
+  - [x] Add basic interactive chat (Phase 1 from CHAT_FEATURE.md)
+  - [ ] Add enhanced user experience (Phase 2 from CHAT_FEATURE.md)
+  - [ ] Add profile/config integration (Phase 3 from CHAT_FEATURE.md)
   - [ ] Enable user to edit messages in $EDITOR
 - [ ] Add verbose mode
   - [x] Implement token usage tracking
@@ -118,8 +119,8 @@
 ## Phase 9: Polish and Distribution
 *Deliverable: Production-ready package published to NPM*
 
-- [ ] Optimize performance
-  - [ ] Improve startup time
+- [x] Optimize performance
+  - [x] Improve startup time
   - [x] Enhance streaming performance
 - [x] Implement CI/CD pipeline
   - [x] Set up GitHub Actions for testing
