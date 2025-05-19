@@ -21,6 +21,19 @@ vi.mock('node:readline', () => ({
   }),
 }));
 
+vi.mock('chalk', () => ({
+  default: {
+    blue: vi.fn((text) => text),
+    cyan: vi.fn((text) => text),
+    green: vi.fn((text) => text),
+    magenta: vi.fn((text) => text),
+  },
+}));
+
+vi.mock('ansi-escapes', () => ({
+  clearScreen: 'mock-clear-screen',
+}));
+
 vi.mock('../conversation', () => ({
   addMessageToConversation: vi.fn(),
   loadLastConversation: vi.fn(),
@@ -80,7 +93,7 @@ describe('chat module', () => {
     expect(readline.createInterface).toHaveBeenCalledWith({
       input: process.stdin,
       output: process.stdout,
-      prompt: '> ',
+      prompt: expect.any(String),
     });
   });
 

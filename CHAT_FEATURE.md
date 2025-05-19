@@ -22,16 +22,15 @@
 ## Phase 2: Enhanced User Experience
 *Deliverable: Visually improved chat interface with clear user/assistant distinction*
 
-- Enhance `src/cli/chat.ts` with visual improvements:
-  - [ ] Add colored prompt symbol (e.g., "› ") using existing color utilities
-  - [ ] Style user input in cyan using existing color functions in `src/cli/color/`
-  - [ ] Maintain clear visual separation between chat turns
-  - [ ] Display streaming responses using existing streaming functionality
+- [x] Enhance `src/cli/chat.ts` with visual improvements:
+  - [x] Add colored prompt symbol ("⟫⟫⟫ ") in color using chalk
+  - [x] Maintain clear visual separation between chat turns with additional newlines
+  - [x] Display streaming responses using existing streaming functionality
 
-- [ ] Add session management:
-  - [ ] Save conversation after each chat turn
+- [x] Add session management:
+  - [x] Save conversation after each chat turn
+    - [ ] bug: sometimes conversation is continued even when I haven't passed `-e`
   - [ ] Properly handle interrupts to ensure conversation state is preserved
-  - [ ] Clear terminal and show welcome message when starting chat
 
 ## Phase 3: Integration with Configuration
 *Deliverable: Chat mode that respects user profiles and settings*
@@ -46,6 +45,18 @@
   - [ ] Show visual indicator when continuing a conversation
   - [ ] Display message count when continuing conversations
   - [ ] Ensure configuration choices are persistent throughout chat session
+
+## Phase 4: Add Commands
+(needs expanding)
+
+I want to add:
+  - `/exit` - quit
+  - `/verbose` - toggle verbose mode
+  - `/convo` - view entire convo so far
+  - `/clear` - start new convo
+  - `/copy` - copy last response to clipboard
+maybe these too
+  - `/profile` - set profile mid convo
 
 ## Implementation Notes
 

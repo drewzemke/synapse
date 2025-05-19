@@ -3,6 +3,7 @@
  */
 
 import { createInterface } from 'node:readline';
+import chalk from 'chalk';
 import {
   addMessageToConversation,
   type Conversation,
@@ -12,6 +13,9 @@ import {
 import { createLLMFromEnv, type LLM } from '../llm';
 import { streamWithCodeColor } from './color/stream';
 import { startSpinner, stopSpinner } from './spinner';
+
+// TODO: print this without color if color is turned off
+const PROMPT_MARKER = `${chalk.blue('⟫')}${chalk.cyan('⟫')}${chalk.green('⟫')}`;
 
 /**
  * Start an interactive chat session
@@ -27,7 +31,7 @@ export async function startChatSession(
   const rl = createInterface({
     input: process.stdin,
     output: process.stdout,
-    prompt: '> ',
+    prompt: `${PROMPT_MARKER} `,
   });
 
   // Initialize the conversation
@@ -51,7 +55,14 @@ export async function startChatSession(
 
   // If an initial prompt is provided, process it
   if (initialPrompt) {
+    // Print the initial prompt
+    console.log(PROMPT_MARKER, initialPrompt, '\n');
     await processUserInput(initialPrompt, llm, conversation);
+    console.log('\n');
+  } else {
+    // Display welcome message in magenta
+    // console.log(chalk.magenta('⟫⟫⟫ synapse chat'));
+    // console.log('Press ctrl-D or ctrl-C to exit.');
   }
 
   // Set up the chat loop
@@ -67,9 +78,14 @@ export async function startChatSession(
     }
 
     if (input) {
+      console.log('');
+
       // Load the latest conversation before processing, since it might have been updated
       const latestConversation = loadLastConversation() || conversation;
       await processUserInput(input, llm, latestConversation);
+
+      // Add extra line break after each message exchange
+      console.log('\n');
     }
 
     rl.prompt();
@@ -119,7 +135,7 @@ async function processUserInput(
     );
   }
 
-  console.log(''); // Add a blank line after response for readability
+  // The newline after response is now handled in the line event handler
 }
 
 /**
