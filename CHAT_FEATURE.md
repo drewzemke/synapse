@@ -32,6 +32,8 @@
     - [ ] bug: sometimes conversation is continued even when I haven't passed `-e`
   - [ ] Properly handle interrupts to ensure conversation state is preserved
 
+- [ ] add README section that explains feature in depth
+
 ## Phase 3: Integration with Configuration
 *Deliverable: Chat mode that respects user profiles and settings*
 

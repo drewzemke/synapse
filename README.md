@@ -9,7 +9,7 @@ Synapse (`sy`) is a lightweight command-line utility that serves as a quick cond
 - User-defined profiles with custom system prompts
 - User-defined models with multiple provider support
 - Conversation history and continuation
-- Interactive chat mode (coming soon!)
+- Interactive chat mode
 
 ## Installation
 
@@ -52,7 +52,7 @@ sy -e -m claude "Can you elaborate on that?"
 # Show the last response from the LLM
 sy -l
 
-# Start an interactive chat session (NOTE: not yet implemented!)
+# Start an interactive chat session 
 sy --chat
 
 # Pipe content as context for the query
