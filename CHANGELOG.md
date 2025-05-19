@@ -1,3 +1,11 @@
+# [1.11.0](https://github.com/drewzemke/synapse/compare/v1.10.0...v1.11.0) (2025-05-19)
+
+
+### Features
+
+* **chat:** improve spacing and prompt style ([80e8a70](https://github.com/drewzemke/synapse/commit/80e8a70a27049bf83db087a470ac1b6a3d5a7b2e))
+* **chat:** initial impl of chat repl ([95a23f8](https://github.com/drewzemke/synapse/commit/95a23f8f240fba520f9c8bb88ab5e5f74716771e))
+
 # [1.10.0](https://github.com/drewzemke/synapse/compare/v1.9.0...v1.10.0) (2025-05-18)
 
 
