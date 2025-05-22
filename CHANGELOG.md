@@ -1,3 +1,17 @@
+# [1.12.0](https://github.com/drewzemke/synapse/compare/v1.11.0...v1.12.0) (2025-05-22)
+
+
+### Bug Fixes
+
+* broken test ([6eb711a](https://github.com/drewzemke/synapse/commit/6eb711a741d883a02c45fc8ec29c09e900919099))
+
+
+### Features
+
+* **chat:** add /convo command ([d125435](https://github.com/drewzemke/synapse/commit/d1254352360b85f48cf6e9d6e2a3bcde27a6c648))
+* **chat:** add initial impl of slash-commands ([9479fbe](https://github.com/drewzemke/synapse/commit/9479fbeb72df360233b20b204a47de9c01ddce86))
+* **chat:** respect user config, add readme entry ([239c094](https://github.com/drewzemke/synapse/commit/239c09410f501063db9daa1b81928d8431ef6d1e))
+
 # [1.11.0](https://github.com/drewzemke/synapse/compare/v1.10.0...v1.11.0) (2025-05-19)
 
 
