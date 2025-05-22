@@ -11,6 +11,7 @@ import {
 import { createLLMFromEnv } from '../llm';
 import { startChatSession } from './chat';
 import { streamWithCodeColor } from './color/stream';
+import { executeCommand } from './commands';
 
 // Mock modules
 vi.mock('node:readline', () => ({
@@ -56,6 +57,11 @@ vi.mock('../llm', () => ({
   }),
 }));
 
+vi.mock('./commands', () => ({
+  registerBuiltInCommands: vi.fn(),
+  executeCommand: vi.fn(),
+}));
+
 describe('chat module', () => {
   const mockReadlineInstance = {
     prompt: vi.fn(),
@@ -79,7 +85,7 @@ describe('chat module', () => {
     vi.clearAllMocks();
   });
 
-  it('creates a readline interface when starting chat session', async () => {
+  it('creates a readline interface with completer when starting chat session', async () => {
     const startChatPromise = startChatSession();
 
     // Simulate 'close' event to resolve the promise
@@ -94,6 +100,7 @@ describe('chat module', () => {
       input: process.stdin,
       output: process.stdout,
       prompt: expect.any(String),
+      completer: expect.any(Function),
     });
   });
 
@@ -199,5 +206,54 @@ describe('chat module', () => {
     closeHandler();
 
     await startChatPromise;
+  });
+
+  it('processes slash commands correctly', async () => {
+    (executeCommand as any).mockReturnValue(true);
+    const startChatPromise = startChatSession();
+
+    // Find the line handler
+    const lineHandler = mockReadlineInstance.on.mock.calls.find((call) => call[0] === 'line')?.[1];
+
+    // Simulate user typing a command
+    await lineHandler('/help');
+
+    expect(executeCommand).toHaveBeenCalledWith('help', expect.any(Object));
+
+    // Should not try to process as regular input
+    expect(addMessageToConversation).not.toHaveBeenCalled();
+
+    // Simulate 'close' event to resolve the promise
+    const closeHandler = mockReadlineInstance.on.mock.calls.find(
+      (call) => call[0] === 'close',
+    )?.[1];
+    closeHandler();
+
+    await startChatPromise;
+  });
+
+  it('handles unknown commands', async () => {
+    const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    (executeCommand as any).mockReturnValue(false);
+
+    const startChatPromise = startChatSession();
+
+    // Find the line handler
+    const lineHandler = mockReadlineInstance.on.mock.calls.find((call) => call[0] === 'line')?.[1];
+
+    // Simulate user typing an unknown command
+    await lineHandler('/unknown');
+
+    expect(executeCommand).toHaveBeenCalledWith('unknown', expect.any(Object));
+    expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('Unknown command'));
+
+    // Simulate 'close' event to resolve the promise
+    const closeHandler = mockReadlineInstance.on.mock.calls.find(
+      (call) => call[0] === 'close',
+    )?.[1];
+    closeHandler();
+
+    await startChatPromise;
+    consoleLogSpy.mockRestore();
   });
 });

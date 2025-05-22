@@ -14,6 +14,7 @@ import {
 import { createLLMFromEnv, type LLM } from '../llm';
 import type { SynapseArgs } from './args';
 import { streamWithCodeColor } from './color/stream';
+import { commandRegistry, executeCommand, registerBuiltInCommands } from './commands';
 import { startSpinner, stopSpinner } from './spinner';
 
 const PROMPT_MARKER = `${chalk.blue('⟫')}${chalk.cyan('⟫')}${chalk.green('⟫')}`;
@@ -30,11 +31,22 @@ export async function startChatSession(
   extendConversation = false,
   args?: Partial<SynapseArgs>,
 ): Promise<void> {
-  // Create readline interface for user input
+  // Register built-in commands
+  registerBuiltInCommands();
+
+  // Create readline interface for user input with command autocomplete
   const rl = createInterface({
     input: process.stdin,
     output: process.stdout,
     prompt: `${PROMPT_MARKER} `,
+    completer: (line: string) => {
+      if (line.startsWith('/')) {
+        const commandPart = line.slice(1);
+        const completions = commandRegistry.getCompletions(commandPart);
+        return [completions.map((c) => `/${c}`), line];
+      }
+      return [[], line];
+    },
   });
 
   // Get configuration options
@@ -81,9 +93,15 @@ export async function startChatSession(
   rl.on('line', async (line) => {
     const input = line.trim();
 
-    // Check for exit commands
-    if (input.toLowerCase() === 'exit' || input.toLowerCase() === 'quit') {
-      rl.close();
+    // Handle commands that start with /
+    if (input.startsWith('/')) {
+      const commandName = input.slice(1).split(' ')[0];
+      const commandExecuted = executeCommand(commandName, rl);
+
+      if (!commandExecuted) {
+        console.log(`Unknown command: ${commandName}`);
+        rl.prompt();
+      }
       return;
     }
 

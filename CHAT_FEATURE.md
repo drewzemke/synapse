@@ -49,16 +49,21 @@
   - [x] Ensure configuration choices are persistent throughout chat session
 
 ## Phase 4: Add Commands
-(needs expanding)
+*Deliverable: Command system with auto-completion for enhanced interaction*
 
-I want to add:
-  - `/exit` - quit
-  - `/verbose` - toggle verbose mode
-  - `/convo` - view entire convo so far
-  - `/clear` - start new convo
-  - `/copy` - copy last response to clipboard
-maybe these too
-  - `/profile` - set profile mid convo
+- [x] Create command system:
+  - [x] Create a command registry in `src/cli/commands.ts`
+  - [x] Implement `/help` command to show available commands
+  - [x] Implement `/exit` command to quit the chat session
+  - [x] Add autocomplete for commands using node:readline built-in support
+  - [x] Write tests for commands and autocomplete functionality
+
+- [ ] Add additional commands:
+  - [ ] `/verbose` - toggle verbose mode
+  - [ ] `/convo` - view entire conversation so far
+  - [ ] `/clear` - start new conversation
+  - [ ] `/copy` - copy last response to clipboard
+  - [ ] `/profile` - set profile mid-conversation
 
 ## Implementation Notes
 
