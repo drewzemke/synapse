@@ -11,7 +11,7 @@ import { colorCodeBlocks } from './cli/color';
 import { streamWithCodeColor } from './cli/color/stream';
 import { createPromptWithPipedInput } from './cli/piped-prompt';
 import { startSpinner, stopSpinner } from './cli/spinner';
-import { configManager, DEFAULT_MODEL_ANTHROPIC as DEFAULT_MODEL, type ModelSpec } from './config';
+import { configManager } from './config';
 import {
   addMessageToConversation,
   type Conversation,
@@ -62,17 +62,17 @@ async function main() {
 
     // Load configuration
     loadConfiguration();
-    const config = configManager.getConfig();
 
-    // args.color and args.noColor will never be set at the same time,
-    // so this has the effect of prioritizing whichever of the two
-    // args the user has passed, falling back to the config (which itself
-    // defaults to false if not set)
-    const printColor = process.stdout.isTTY && (args.color ?? args.noColor ?? config.general.color);
-
-    // same as above
-    const streamOutput =
-      process.stdout.isTTY && (args.stream ?? args.noStream ?? config.general.stream);
+    const printColor = configManager.resolveColorOutput(
+      args.color,
+      args.noColor,
+      process.stdout.isTTY,
+    );
+    const streamOutput = configManager.resolveStreamOutput(
+      args.stream,
+      args.noStream,
+      process.stdout.isTTY,
+    );
 
     if (args.verbose) {
       console.log('Synapse CLI initialized');
@@ -93,7 +93,7 @@ async function main() {
       const initialPrompt = args.prompt || args._.join(' ');
 
       // Start the chat session
-      await startChatSession(initialPrompt || undefined, args.extend);
+      await startChatSession(initialPrompt || undefined, args.extend, args);
       return;
     }
 
@@ -104,24 +104,10 @@ async function main() {
 
     // Create LLM provider from environment variables
     try {
-      // Get the specified profile (or default if none specified)
-      // TODO: refactor some of this to be in the config manager
       const profileName = args.profile;
       const profile = configManager.getProfile(profileName);
 
-      // Get the specified model (or default if none specified)
-      // TODO: refactor some of this to be in the config manager
-      let model: ModelSpec;
-      if (args.model) {
-        // If a model is specified via command line, get it from config
-        model = configManager.getModel(args.model);
-      } else if (config.general.default_model) {
-        // Try using the default model specfied in the config
-        model = configManager.getModel(config.general.default_model);
-      } else {
-        // Otherwise use the default model
-        model = DEFAULT_MODEL;
-      }
+      const model = configManager.getModel(args.model);
 
       // Create LLM provider with options from profile
       const llm = createLLMFromEnv(model);

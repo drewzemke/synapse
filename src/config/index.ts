@@ -115,7 +115,7 @@ export class ConfigManager {
   }
 
   /**
-   * Get a specific model by name
+   * Get a specific model by name, with fallback to config default or built-in default
    * @param modelName The name of the model to get
    * @returns The model, or the default model if not found
    */
@@ -124,17 +124,60 @@ export class ConfigManager {
       this.loadConfig();
     }
 
-    if (!modelName) {
-      // Return default Anthropic model if no model name is provided
-      return DEFAULT_MODEL_ANTHROPIC;
+    if (modelName) {
+      // If a model name is explicitly provided, try to get it
+      if (!this.config.models?.[modelName]) {
+        throw new Error(`Model '${modelName}' not found`);
+      }
+      return this.config.models[modelName];
     }
 
-    // If the user requested a model that they have not defined, throw an error
-    if (!this.config.models?.[modelName]) {
-      throw new Error(`Model '${modelName}' not found`);
+    // Try using the default model specified in the config
+    if (
+      this.config.general.default_model &&
+      this.config.models?.[this.config.general.default_model]
+    ) {
+      return this.config.models[this.config.general.default_model];
     }
 
-    return this.config.models[modelName];
+    // Fall back to built-in default
+    return DEFAULT_MODEL_ANTHROPIC;
+  }
+
+  /**
+   * Resolve whether to use color output based on CLI args and config
+   * @param colorArg CLI --color flag value
+   * @param noColorArg CLI --no-color flag value
+   * @param isTTY Whether output is a TTY
+   * @returns Whether to use color output
+   */
+  public resolveColorOutput(colorArg?: boolean, noColorArg?: boolean, isTTY = true): boolean {
+    const config = this.getConfig();
+
+    // Check if explicitly specified in CLI args
+    if (colorArg !== undefined) return colorArg;
+    if (noColorArg !== undefined) return !noColorArg;
+
+    // Otherwise use config default (only if TTY)
+    return isTTY && config.general.color;
+  }
+
+  /**
+   * Resolve whether to stream output based on CLI args and config
+   * @param streamArg CLI --stream flag value
+   * @param noStreamArg CLI --no-stream flag value
+   * @param isTTY Whether output is a TTY
+   * @returns Whether to stream output
+   */
+  public resolveStreamOutput(streamArg?: boolean, noStreamArg?: boolean, isTTY = true): boolean {
+    const config = this.getConfig();
+
+    // Check if explicitly specified in CLI args
+    if (streamArg !== undefined) return streamArg;
+    if (noStreamArg !== undefined) return !noStreamArg;
+
+    // Otherwise use config default (only if TTY)
+    return isTTY && config.general.stream;
   }
 
   /**

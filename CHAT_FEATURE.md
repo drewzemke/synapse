@@ -32,21 +32,21 @@
     - [ ] bug: sometimes conversation is continued even when I haven't passed `-e`
   - [ ] Properly handle interrupts to ensure conversation state is preserved
 
-- [ ] add README section that explains feature in depth
+- [x] add README section that explains feature in depth
 
 ## Phase 3: Integration with Configuration
 *Deliverable: Chat mode that respects user profiles and settings*
 
-- Ensure chat module respects user configuration:
-  - [ ] Honor selected profile (`-p/--profile`) in chat sessions
-  - [ ] Honor selected model (`-m/--model`) in chat sessions
-  - [ ] Apply color configuration for code blocks in responses
-  - [ ] Support verbose mode in chat to show token usage after each response
+- [x] Ensure chat module respects user configuration:
+  - [x] Honor selected profile (`-p/--profile`) in chat sessions
+  - [x] Honor selected model (`-m/--model`) in chat sessions
+  - [x] Apply color configuration for code blocks in responses
+  - [x] Support verbose mode in chat to show token usage after each response
 
-- [ ] Add proper conversation state display:
-  - [ ] Show visual indicator when continuing a conversation
-  - [ ] Display message count when continuing conversations
-  - [ ] Ensure configuration choices are persistent throughout chat session
+- [x] Add proper conversation state display:
+  - [x] Show visual indicator when continuing a conversation
+  - [x] Display message count when continuing conversations
+  - [x] Ensure configuration choices are persistent throughout chat session
 
 ## Phase 4: Add Commands
 (needs expanding)

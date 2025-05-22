@@ -4,6 +4,7 @@
 
 import { createInterface } from 'node:readline';
 import chalk from 'chalk';
+import { configManager } from '../config';
 import {
   addMessageToConversation,
   type Conversation,
@@ -11,10 +12,10 @@ import {
   saveConversation,
 } from '../conversation';
 import { createLLMFromEnv, type LLM } from '../llm';
+import type { SynapseArgs } from './args';
 import { streamWithCodeColor } from './color/stream';
 import { startSpinner, stopSpinner } from './spinner';
 
-// TODO: print this without color if color is turned off
 const PROMPT_MARKER = `${chalk.blue('⟫')}${chalk.cyan('⟫')}${chalk.green('⟫')}`;
 
 /**
@@ -22,10 +23,12 @@ const PROMPT_MARKER = `${chalk.blue('⟫')}${chalk.cyan('⟫')}${chalk.green('�
  *
  * @param initialPrompt - Optional initial prompt to start the conversation
  * @param extendConversation - Whether to continue from the last conversation
+ * @param args - Command line arguments
  */
 export async function startChatSession(
   initialPrompt?: string,
   extendConversation = false,
+  args?: Partial<SynapseArgs>,
 ): Promise<void> {
   // Create readline interface for user input
   const rl = createInterface({
@@ -34,35 +37,42 @@ export async function startChatSession(
     prompt: `${PROMPT_MARKER} `,
   });
 
+  // Get configuration options
+  const profileName = args?.profile;
+  const profile = configManager.getProfile(profileName);
+  const model = configManager.getModel(args?.model);
+  const printColor = configManager.resolveColorOutput(
+    args?.color,
+    args?.noColor,
+    process.stdout.isTTY,
+  );
+  const verbose = args?.verbose ?? false;
+
   // Initialize the conversation
   let conversation: Conversation;
-  const llm = createLLMFromEnv({ provider: 'anthropic', modelStr: 'claude-3-sonnet-20240229' }); // Default model
+  const llm = createLLMFromEnv(model);
 
   if (extendConversation) {
     // Load the previous conversation if available
     const lastConversation = loadLastConversation();
     if (!lastConversation) {
       console.log('No previous conversation found. Starting a new conversation.');
-      conversation = createNewConversation();
+      conversation = createNewConversation(profileName, profile.temperature);
     } else {
       conversation = lastConversation;
-      console.log('Continuing previous conversation.');
+      const messageCount = lastConversation.messages.length;
+      console.log(`Continuing previous conversation with ${messageCount} messages.`);
     }
   } else {
     // Start a new conversation
-    conversation = createNewConversation();
+    conversation = createNewConversation(profileName, profile.temperature, profile.system_prompt);
   }
 
   // If an initial prompt is provided, process it
   if (initialPrompt) {
-    // Print the initial prompt
     console.log(PROMPT_MARKER, initialPrompt, '\n');
-    await processUserInput(initialPrompt, llm, conversation);
+    await processUserInput(initialPrompt, llm, conversation, printColor, verbose);
     console.log('\n');
-  } else {
-    // Display welcome message in magenta
-    // console.log(chalk.magenta('⟫⟫⟫ synapse chat'));
-    // console.log('Press ctrl-D or ctrl-C to exit.');
   }
 
   // Set up the chat loop
@@ -82,7 +92,7 @@ export async function startChatSession(
 
       // Load the latest conversation before processing, since it might have been updated
       const latestConversation = loadLastConversation() || conversation;
-      await processUserInput(input, llm, latestConversation);
+      await processUserInput(input, llm, latestConversation, printColor, verbose);
 
       // Add extra line break after each message exchange
       console.log('\n');
@@ -113,6 +123,8 @@ async function processUserInput(
   input: string,
   llm: LLM,
   conversationParam: Conversation,
+  useColor = true,
+  verbose = false,
 ): Promise<void> {
   // Add user message to conversation
   let updatedConversation = addMessageToConversation(conversationParam, 'user', input);
@@ -121,12 +133,35 @@ async function processUserInput(
   startSpinner();
 
   try {
-    // Get response from LLM and update conversation
-    const response = await streamWithCodeColor(llm, updatedConversation);
+    let response: string;
+
+    if (useColor) {
+      response = await streamWithCodeColor(llm, updatedConversation);
+    } else {
+      response = '';
+      let firstChunk = true;
+      for await (const chunk of llm.streamText(updatedConversation.messages)) {
+        if (firstChunk) {
+          firstChunk = false;
+          stopSpinner();
+        }
+        process.stdout.write(chunk);
+        response += chunk;
+      }
+      console.log();
+    }
+
     updatedConversation = addMessageToConversation(updatedConversation, 'assistant', response);
 
     // Save updated conversation
     saveConversation(updatedConversation);
+
+    // Show token usage if verbose mode is enabled
+    if (verbose && llm.getUsage) {
+      console.log('\n------------');
+      console.log('Token usage:');
+      console.log(llm.getUsage());
+    }
   } catch (error) {
     stopSpinner();
     console.error(
@@ -134,17 +169,19 @@ async function processUserInput(
       error instanceof Error ? error.message : String(error),
     );
   }
-
-  // The newline after response is now handled in the line event handler
 }
 
 /**
  * Create a new conversation
  */
-function createNewConversation(): Conversation {
+function createNewConversation(
+  profileName?: string,
+  temperature = 0.7,
+  systemPrompt?: string,
+): Conversation {
   return {
-    profile: 'default',
-    temperature: 1.0,
-    messages: [],
+    profile: profileName ?? 'default',
+    temperature,
+    messages: systemPrompt ? [{ role: 'system', content: systemPrompt }] : [],
   };
 }

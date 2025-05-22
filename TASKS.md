@@ -96,7 +96,7 @@
   - [x] Implement conversation history tracking
   - [x] Add basic interactive chat (Phase 1 from CHAT_FEATURE.md)
   - [x] Add enhanced user experience (Phase 2 from CHAT_FEATURE.md)
-  - [ ] Add profile/config integration (Phase 3 from CHAT_FEATURE.md)
+  - [x] Add profile/config integration (Phase 3 from CHAT_FEATURE.md)
   - [ ] Enable user to edit messages in $EDITOR
 - [ ] Add verbose mode
   - [x] Implement token usage tracking

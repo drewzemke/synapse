@@ -76,6 +76,29 @@ sy -e "Can you explain the first one in more detail?"
 sy -e "How does that compare to the Open/Closed Principle?"
 ```
 
+### Interactive Chat Mode
+
+Synapse offers an interactive chat mode that lets you have back-and-forth conversations without repeatedly invoking the command.
+
+```shell
+# Start a new chat session
+sy --chat
+
+# Start a chat with an initial prompt
+sy --chat "Let's talk about functional programming"
+
+# Continue your previous conversation in chat mode
+sy --chat -e
+
+# Use a specific profile and model in chat
+sy --chat -p coding -m gpt4
+
+# Combine with verbose mode to see token usage
+sy --chat -v
+```
+
+Your selected configuration (profile, model, etc) will persist throughout the chat session. Type `exit` or press Ctrl+C to exit the chat.
+
 ## Configuration
 
 Synapse can be configured using a TOML file. The configuration file is automatically loaded from:
