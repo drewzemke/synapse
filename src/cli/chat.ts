@@ -3,7 +3,6 @@
  */
 
 import { createInterface } from 'node:readline';
-import chalk from 'chalk';
 import { configManager } from '../config';
 import {
   addMessageToConversation,
@@ -15,9 +14,8 @@ import { createLLMFromEnv, type LLM } from '../llm';
 import type { SynapseArgs } from './args';
 import { streamWithCodeColor } from './color/stream';
 import { commandRegistry, executeCommand, registerBuiltInCommands } from './commands';
+import { PROMPT_MARKER } from './prompt-marker';
 import { startSpinner, stopSpinner } from './spinner';
-
-const PROMPT_MARKER = `${chalk.blue('⟫')}${chalk.cyan('⟫')}${chalk.green('⟫')}`;
 
 /**
  * Start an interactive chat session

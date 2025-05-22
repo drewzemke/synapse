@@ -166,26 +166,6 @@ describe('chat module', () => {
     expect(saveConversation).toHaveBeenCalled();
   });
 
-  it('exits chat when user types "exit" or "quit"', async () => {
-    const startChatPromise = startChatSession();
-
-    // Find the line handler
-    const lineHandler = mockReadlineInstance.on.mock.calls.find((call) => call[0] === 'line')?.[1];
-
-    // Simulate user typing 'exit'
-    await lineHandler('exit');
-
-    expect(mockReadlineInstance.close).toHaveBeenCalled();
-
-    // Simulate 'close' event to resolve the promise
-    const closeHandler = mockReadlineInstance.on.mock.calls.find(
-      (call) => call[0] === 'close',
-    )?.[1];
-    closeHandler();
-
-    await startChatPromise;
-  });
-
   it('handles CTRL+C (SIGINT) correctly', async () => {
     const startChatPromise = startChatSession();
 

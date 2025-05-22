@@ -60,10 +60,10 @@
 
 - [ ] Add additional commands:
   - [ ] `/verbose` - toggle verbose mode
-  - [ ] `/convo` - view entire conversation so far
   - [ ] `/clear` - start new conversation
   - [ ] `/copy` - copy last response to clipboard
   - [ ] `/profile` - set profile mid-conversation
+  - [x] `/convo` - view entire conversation so far
 
 ## Implementation Notes
 

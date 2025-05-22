@@ -1,5 +1,6 @@
 import type * as readline from 'node:readline';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { type Conversation, loadLastConversation } from '../conversation';
 import { commandRegistry, registerCommand } from './commands';
 
 describe('commands', () => {
@@ -102,5 +103,55 @@ describe('commands', () => {
     exitCommand?.execute(mockRl);
 
     expect(mockRl.close).toHaveBeenCalled();
+  });
+
+  it('should execute the /convo command', () => {
+    const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    const mockConversation: Conversation = {
+      profile: 'default',
+      temperature: 0.7,
+      messages: [
+        { role: 'user', content: 'Hello' },
+        { role: 'assistant', content: 'Hi there! How can I help you?' },
+        { role: 'user', content: 'What is Node.js?' },
+        { role: 'assistant', content: 'Node.js is a JavaScript runtime...' },
+      ],
+    };
+
+    vi.mock('../conversation');
+    vi.mocked(loadLastConversation).mockReturnValue(mockConversation);
+
+    const mockRl = {
+      prompt: vi.fn(),
+    } as unknown as readline.Interface;
+
+    const convoExecute = commandRegistry.getBuiltInCommands().convo.execute;
+
+    // Register convo command
+    registerCommand({
+      name: 'convo',
+      description: 'Show conversation history',
+      execute: convoExecute,
+    });
+
+    // Execute convo command
+    const convoCommand = commandRegistry.getCommand('convo');
+    convoCommand?.execute(mockRl);
+
+    // Verify each message in the conversation was logged
+    expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('Hello'));
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Hi there! How can I help you?'),
+    );
+    expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('What is Node.js?'));
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Node.js is a JavaScript runtime...'),
+    );
+
+    // Ensure prompt is called to restore the input prompt
+    expect(mockRl.prompt).toHaveBeenCalled();
+
+    consoleLogSpy.mockRestore();
   });
 });

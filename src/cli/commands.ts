@@ -1,4 +1,8 @@
 import type { Interface as ReadlineInterface } from 'node:readline';
+import { configManager } from '../config';
+import { loadLastConversation } from '../conversation';
+import { colorCodeBlocks } from './color';
+import { PROMPT_MARKER } from './prompt-marker';
 
 export interface Command {
   name: string;
@@ -23,6 +27,47 @@ class CommandRegistry {
 
   getBuiltInCommands(): Record<string, Command> {
     return {
+      convo: {
+        name: 'convo',
+        description: 'Show conversation history',
+        execute: (rl: ReadlineInterface) => {
+          const conversation = loadLastConversation();
+
+          if (!conversation || conversation.messages.length === 0) {
+            console.log('\nNo conversation history found.');
+            rl.prompt();
+            return;
+          }
+
+          console.log('\nConversation History:');
+          console.log('---------------------\n');
+
+          const useColor = configManager.resolveColorOutput(
+            undefined,
+            undefined,
+            process.stdout.isTTY,
+          );
+
+          for (const message of conversation.messages) {
+            if (message.role === 'system') {
+              continue; // Skip system messages
+            }
+
+            if (message.role === 'user') {
+              console.log(`${PROMPT_MARKER} ${message.content}`);
+            } else {
+              // For assistant messages, apply code coloring if enabled
+              const content = useColor ? colorCodeBlocks(message.content) : message.content;
+              console.log(content);
+            }
+
+            // Add a newline between messages for better readability
+            console.log('');
+          }
+
+          rl.prompt();
+        },
+      },
       help: {
         name: 'help',
         description: 'Show available commands',
