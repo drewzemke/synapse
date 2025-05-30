@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/drewzemke/synapse/compare/v1.12.0...v1.13.0) (2025-05-30)
+
+
+### Features
+
+* **chat:** add /copy command ([54f3e5a](https://github.com/drewzemke/synapse/commit/54f3e5ab3d4277159cbe27b1f060595b96fb5127))
+
 # [1.12.0](https://github.com/drewzemke/synapse/compare/v1.11.0...v1.12.0) (2025-05-22)
 
 
