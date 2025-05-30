@@ -1,4 +1,5 @@
 import type { Interface as ReadlineInterface } from 'node:readline';
+import clipboardy from 'clipboardy';
 import { configManager } from '../config';
 import { loadLastConversation } from '../conversation';
 import { colorCodeBlocks } from './color';
@@ -63,6 +64,42 @@ class CommandRegistry {
 
             // Add a newline between messages for better readability
             console.log('');
+          }
+
+          rl.prompt();
+        },
+      },
+      copy: {
+        name: 'copy',
+        description: 'Copy last response to clipboard',
+        execute: (rl: ReadlineInterface) => {
+          const conversation = loadLastConversation();
+
+          if (!conversation || conversation.messages.length === 0) {
+            console.log('No conversation found to copy from.');
+            rl.prompt();
+            return;
+          }
+
+          // Find the most recent assistant message
+          const lastAssistantMessage = conversation.messages
+            .slice()
+            .reverse()
+            .find((msg) => msg.role === 'assistant');
+
+          if (!lastAssistantMessage) {
+            console.log('No assistant message found to copy.');
+            rl.prompt();
+            return;
+          }
+
+          try {
+            clipboardy.writeSync(lastAssistantMessage.content);
+            console.log('Last response copied to clipboard.');
+          } catch (error) {
+            console.log(
+              `Failed to copy to clipboard: ${error instanceof Error ? error.message : String(error)}`,
+            );
           }
 
           rl.prompt();

@@ -59,10 +59,11 @@
   - [x] Write tests for commands and autocomplete functionality
 
 - [ ] Add additional commands:
-  - [ ] `/verbose` - toggle verbose mode
   - [ ] `/clear` - start new conversation
-  - [ ] `/copy` - copy last response to clipboard
+  - [ ] `/verbose` - toggle verbose mode
   - [ ] `/profile` - set profile mid-conversation
+    - [ ] should autocomplete with available profiles
+  - [x] `/copy` - copy last response to clipboard
   - [x] `/convo` - view entire conversation so far
 
 ## Implementation Notes

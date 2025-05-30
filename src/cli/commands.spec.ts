@@ -1,7 +1,14 @@
 import type * as readline from 'node:readline';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { type Conversation, loadLastConversation } from '../conversation';
 import { commandRegistry, registerCommand } from './commands';
+
+// Mock clipboardy
+vi.mock('clipboardy', () => ({
+  default: {
+    writeSync: vi.fn(),
+  },
+}));
 
 describe('commands', () => {
   beforeEach(() => {
@@ -153,5 +160,188 @@ describe('commands', () => {
     expect(mockRl.prompt).toHaveBeenCalled();
 
     consoleLogSpy.mockRestore();
+  });
+
+  describe('/copy command', () => {
+    let mockRl: readline.Interface;
+    let consoleLogSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      mockRl = {
+        prompt: vi.fn(),
+      } as unknown as readline.Interface;
+      consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      vi.clearAllMocks();
+    });
+
+    afterEach(() => {
+      consoleLogSpy.mockRestore();
+    });
+
+    it('should copy the last assistant message to clipboard', async () => {
+      const clipboardy = await import('clipboardy');
+
+      const mockConversation: Conversation = {
+        profile: 'default',
+        temperature: 0.7,
+        messages: [
+          { role: 'user', content: 'Hello' },
+          { role: 'assistant', content: 'Hi there! How can I help you?' },
+          { role: 'user', content: 'What is 2+2?' },
+          { role: 'assistant', content: 'The answer is 4.' },
+        ],
+      };
+
+      vi.mocked(loadLastConversation).mockReturnValue(mockConversation);
+
+      const copyExecute = commandRegistry.getBuiltInCommands().copy.execute;
+      registerCommand({
+        name: 'copy',
+        description: 'Copy last response to clipboard',
+        execute: copyExecute,
+      });
+
+      const copyCommand = commandRegistry.getCommand('copy');
+      copyCommand?.execute(mockRl);
+
+      expect(clipboardy.default.writeSync).toHaveBeenCalledWith('The answer is 4.');
+      expect(consoleLogSpy).toHaveBeenCalledWith('Last response copied to clipboard.');
+      expect(mockRl.prompt).toHaveBeenCalled();
+    });
+
+    it('should handle no conversation found', async () => {
+      vi.mocked(loadLastConversation).mockReturnValue(undefined);
+
+      const copyExecute = commandRegistry.getBuiltInCommands().copy.execute;
+      registerCommand({
+        name: 'copy',
+        description: 'Copy last response to clipboard',
+        execute: copyExecute,
+      });
+
+      const copyCommand = commandRegistry.getCommand('copy');
+      copyCommand?.execute(mockRl);
+
+      expect(consoleLogSpy).toHaveBeenCalledWith('No conversation found to copy from.');
+      expect(mockRl.prompt).toHaveBeenCalled();
+    });
+
+    it('should handle empty conversation', async () => {
+      const mockConversation: Conversation = {
+        profile: 'default',
+        temperature: 0.7,
+        messages: [],
+      };
+
+      vi.mocked(loadLastConversation).mockReturnValue(mockConversation);
+
+      const copyExecute = commandRegistry.getBuiltInCommands().copy.execute;
+      registerCommand({
+        name: 'copy',
+        description: 'Copy last response to clipboard',
+        execute: copyExecute,
+      });
+
+      const copyCommand = commandRegistry.getCommand('copy');
+      copyCommand?.execute(mockRl);
+
+      expect(consoleLogSpy).toHaveBeenCalledWith('No conversation found to copy from.');
+      expect(mockRl.prompt).toHaveBeenCalled();
+    });
+
+    it('should handle conversation with no assistant messages', async () => {
+      const mockConversation: Conversation = {
+        profile: 'default',
+        temperature: 0.7,
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant.' },
+          { role: 'user', content: 'Hello' },
+          { role: 'user', content: 'Are you there?' },
+        ],
+      };
+
+      vi.mocked(loadLastConversation).mockReturnValue(mockConversation);
+
+      const copyExecute = commandRegistry.getBuiltInCommands().copy.execute;
+      registerCommand({
+        name: 'copy',
+        description: 'Copy last response to clipboard',
+        execute: copyExecute,
+      });
+
+      const copyCommand = commandRegistry.getCommand('copy');
+      copyCommand?.execute(mockRl);
+
+      expect(consoleLogSpy).toHaveBeenCalledWith('No assistant message found to copy.');
+      expect(mockRl.prompt).toHaveBeenCalled();
+    });
+
+    it('should handle clipboard write failure', async () => {
+      const clipboardy = await import('clipboardy');
+
+      const mockConversation: Conversation = {
+        profile: 'default',
+        temperature: 0.7,
+        messages: [
+          { role: 'user', content: 'Hello' },
+          { role: 'assistant', content: 'Hi there!' },
+        ],
+      };
+
+      vi.mocked(loadLastConversation).mockReturnValue(mockConversation);
+      vi.mocked(clipboardy.default.writeSync).mockImplementation(() => {
+        throw new Error('Clipboard unavailable');
+      });
+
+      const copyExecute = commandRegistry.getBuiltInCommands().copy.execute;
+      registerCommand({
+        name: 'copy',
+        description: 'Copy last response to clipboard',
+        execute: copyExecute,
+      });
+
+      const copyCommand = commandRegistry.getCommand('copy');
+      copyCommand?.execute(mockRl);
+
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        'Failed to copy to clipboard: Clipboard unavailable',
+      );
+      expect(mockRl.prompt).toHaveBeenCalled();
+    });
+
+    it('should find the most recent assistant message when multiple exist', async () => {
+      const clipboardy = await import('clipboardy');
+      // Reset any previous mock implementation
+      vi.mocked(clipboardy.default.writeSync).mockReset();
+
+      const mockConversation: Conversation = {
+        profile: 'default',
+        temperature: 0.7,
+        messages: [
+          { role: 'user', content: 'First question' },
+          { role: 'assistant', content: 'First answer' },
+          { role: 'user', content: 'Second question' },
+          { role: 'assistant', content: 'Second answer' },
+          { role: 'user', content: 'Third question' },
+          { role: 'assistant', content: 'Most recent answer' },
+        ],
+      };
+
+      vi.mocked(loadLastConversation).mockReturnValue(mockConversation);
+
+      const copyExecute = commandRegistry.getBuiltInCommands().copy.execute;
+      registerCommand({
+        name: 'copy',
+        description: 'Copy last response to clipboard',
+        execute: copyExecute,
+      });
+
+      const copyCommand = commandRegistry.getCommand('copy');
+      copyCommand?.execute(mockRl);
+
+      expect(clipboardy.default.writeSync).toHaveBeenCalledWith('Most recent answer');
+      expect(consoleLogSpy).toHaveBeenCalledWith('Last response copied to clipboard.');
+      expect(mockRl.prompt).toHaveBeenCalled();
+    });
   });
 });

@@ -41,6 +41,7 @@
     "ai": "^4.3.13",
     "ansi-escapes": "^7.0.0",
     "chalk": "^5.4.1",
+    "clipboardy": "^4.0.0",
     "nanospinner": "^1.2.2",
     "refractor": "^5.0.0",
     "toml": "^3.0.0",
