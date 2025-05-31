@@ -89,23 +89,16 @@ async function main() {
       process.exit(1);
     }
 
-    // Create LLM provider from environment variables
     try {
       const profileName = args.profile;
       const profile = configManager.getProfile(profileName);
 
       const model = configManager.getModel(args.model);
-
-      // Create LLM provider with options from profile
       const llm = createLLMFromEnv(model);
 
-      // Get the base prompt from arguments
       const basePrompt = args.prompt || args._.join(' ');
-
-      // Check for and combine with any piped input
       const prompt = await createPromptWithPipedInput(basePrompt);
 
-      // initialize conversation
       let conversation: Conversation;
 
       if (args.extend) {
@@ -120,7 +113,7 @@ async function main() {
             ...(profile.system_prompt
               ? [{ role: 'system' as const, content: profile.system_prompt }]
               : []),
-            // user message
+            // user message if there's a prompt
             ...(prompt ? [{ role: 'user' as const, content: prompt }] : []),
           ],
         };
@@ -210,6 +203,8 @@ async function main() {
         console.log(llm.getUsage());
       }
     } catch (error) {
+      stopSpinner();
+
       // FIXME: maybe handle this elsewhere? or at least reconcile it with the error handling below this
       if (error instanceof Error && error.message.includes('AWS region setting is missing')) {
         console.error(
@@ -220,6 +215,7 @@ async function main() {
       throw error;
     }
   } catch (error) {
+    stopSpinner();
     console.error('Error:', error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
