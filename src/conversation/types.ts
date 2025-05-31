@@ -13,7 +13,7 @@ export interface Message {
 }
 
 /**
- * Conversation represents a complete conversation with the LLM
+ * Conversation represents an ongoing conversation with the LLM
  */
 export interface Conversation extends Record<string, unknown> {
   /** Profile used for the conversation */

@@ -3,15 +3,13 @@
  */
 
 import { createInterface } from 'node:readline';
-import { configManager } from '../config';
 import {
   addMessageToConversation,
   type Conversation,
   loadLastConversation,
   saveConversation,
 } from '../conversation';
-import { createLLMFromEnv, type LLM } from '../llm';
-import type { SynapseArgs } from './args';
+import type { LLM } from '../llm';
 import { streamWithCodeColor } from './color/stream';
 import { commandRegistry, executeCommand, registerBuiltInCommands } from './commands';
 import { PROMPT_MARKER } from './prompt-marker';
@@ -25,9 +23,14 @@ import { startSpinner, stopSpinner } from './spinner';
  * @param args - Command line arguments
  */
 export async function startChatSession(
-  initialPrompt?: string,
-  extendConversation = false,
-  args?: Partial<SynapseArgs>,
+  conversation: Conversation,
+  llm: LLM,
+  printColor: boolean,
+  // FIXME: respect this config
+  _streamOutput: boolean,
+  verbose: boolean,
+  /** If true, start processing without prompting for user input. */
+  processImmediately: boolean,
 ): Promise<void> {
   // Register built-in commands
   registerBuiltInCommands();
@@ -47,42 +50,14 @@ export async function startChatSession(
     },
   });
 
-  // Get configuration options
-  const profileName = args?.profile;
-  const profile = configManager.getProfile(profileName);
-  const model = configManager.getModel(args?.model);
-  const printColor = configManager.resolveColorOutput(
-    args?.color,
-    args?.noColor,
-    process.stdout.isTTY,
-  );
-  const verbose = args?.verbose ?? false;
-
-  // Initialize the conversation
-  let conversation: Conversation;
-  const llm = createLLMFromEnv(model);
-
-  if (extendConversation) {
-    // Load the previous conversation if available
-    const lastConversation = loadLastConversation();
-    if (!lastConversation) {
-      console.log('No previous conversation found. Starting a new conversation.');
-      conversation = createNewConversation(profileName, profile.temperature);
-    } else {
-      conversation = lastConversation;
-      const messageCount = lastConversation.messages.length;
-      console.log(`Continuing previous conversation with ${messageCount} messages.`);
-    }
-  } else {
-    // Start a new conversation
-    conversation = createNewConversation(profileName, profile.temperature, profile.system_prompt);
-  }
-
   // If an initial prompt is provided, process it
-  if (initialPrompt) {
-    console.log(PROMPT_MARKER, initialPrompt, '\n');
-    await processUserInput(initialPrompt, llm, conversation, printColor, verbose);
-    console.log('\n');
+  if (processImmediately) {
+    const initialPrompt = conversation.messages.pop()?.content;
+    if (initialPrompt) {
+      console.log(PROMPT_MARKER, initialPrompt, '\n');
+      await processUserInput(initialPrompt, llm, conversation, printColor, verbose);
+      console.log('\n');
+    }
   }
 
   // Set up the chat loop
@@ -142,10 +117,8 @@ async function processUserInput(
   useColor = true,
   verbose = false,
 ): Promise<void> {
-  // Add user message to conversation
   let updatedConversation = addMessageToConversation(conversationParam, 'user', input);
 
-  // Start spinner while waiting for response
   startSpinner();
 
   try {
@@ -185,19 +158,4 @@ async function processUserInput(
       error instanceof Error ? error.message : String(error),
     );
   }
-}
-
-/**
- * Create a new conversation
- */
-function createNewConversation(
-  profileName?: string,
-  temperature = 0.7,
-  systemPrompt?: string,
-): Conversation {
-  return {
-    profile: profileName ?? 'default',
-    temperature,
-    messages: systemPrompt ? [{ role: 'system', content: systemPrompt }] : [],
-  };
 }

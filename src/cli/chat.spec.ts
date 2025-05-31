@@ -2,13 +2,8 @@
 
 import * as readline from 'node:readline';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  addMessageToConversation,
-  type Conversation,
-  loadLastConversation,
-  saveConversation,
-} from '../conversation';
-import { createLLMFromEnv } from '../llm';
+import { addMessageToConversation, type Conversation, saveConversation } from '../conversation';
+import type { LLM } from '../llm';
 import { startChatSession } from './chat';
 import { streamWithCodeColor } from './color/stream';
 import { executeCommand } from './commands';
@@ -50,13 +45,6 @@ vi.mock('./spinner', () => ({
   stopSpinner: vi.fn(),
 }));
 
-vi.mock('../llm', () => ({
-  createLLMFromEnv: vi.fn().mockReturnValue({
-    streamText: vi.fn(),
-    generateText: vi.fn(),
-  }),
-}));
-
 vi.mock('./commands', () => ({
   registerBuiltInCommands: vi.fn(),
   executeCommand: vi.fn(),
@@ -69,15 +57,21 @@ describe('chat module', () => {
     close: vi.fn(),
   };
 
-  const mockLLM = {
+  const mockLLM: LLM = {
     streamText: vi.fn(),
     generateText: vi.fn(),
+    getUsage: vi.fn(),
+  } as unknown as LLM;
+
+  const mockConversation: Conversation = {
+    profile: 'default',
+    temperature: 0.7,
+    messages: [],
   };
 
   beforeEach(() => {
     vi.resetAllMocks();
     (readline.createInterface as any).mockReturnValue(mockReadlineInstance);
-    (createLLMFromEnv as any).mockReturnValue(mockLLM);
     (streamWithCodeColor as any).mockResolvedValue('This is a mock LLM response');
   });
 
@@ -86,7 +80,7 @@ describe('chat module', () => {
   });
 
   it('creates a readline interface with completer when starting chat session', async () => {
-    const startChatPromise = startChatSession();
+    const startChatPromise = startChatSession(mockConversation, mockLLM, true, true, false, false);
 
     // Simulate 'close' event to resolve the promise
     const closeHandler = mockReadlineInstance.on.mock.calls.find(
@@ -104,20 +98,12 @@ describe('chat module', () => {
     });
   });
 
-  // FIXME: this test fails because the mocking needs improvement
-  it.skip('processes user inputs and gets responses from LLM', async () => {
-    const mockConversation = {
-      profile: 'default',
-      temperature: 1.0,
-      messages: [],
-    };
-
+  it('processes user inputs and gets responses from LLM', async () => {
     const mockUpdatedConversation = {
       ...mockConversation,
       messages: [{ role: 'user', content: 'Hello, LLM!' }],
     };
 
-    (loadLastConversation as any).mockReturnValue(mockConversation);
     (addMessageToConversation as any).mockImplementation(
       (_conv: Conversation, role: 'user' | 'assistant', content: string) => {
         if (role === 'user') {
@@ -130,7 +116,7 @@ describe('chat module', () => {
       },
     );
 
-    const startChatPromise = startChatSession();
+    const startChatPromise = startChatSession(mockConversation, mockLLM, true, true, false, false);
 
     // Find the line handler
     const lineHandler = mockReadlineInstance.on.mock.calls.find((call) => call[0] === 'line')?.[1];
@@ -168,7 +154,7 @@ describe('chat module', () => {
   });
 
   it('handles CTRL+C (SIGINT) correctly', async () => {
-    const startChatPromise = startChatSession();
+    const startChatPromise = startChatSession(mockConversation, mockLLM, true, true, false, false);
 
     // Find the SIGINT handler
     const sigintHandler = mockReadlineInstance.on.mock.calls.find(
@@ -191,7 +177,7 @@ describe('chat module', () => {
 
   it('processes slash commands correctly', async () => {
     (executeCommand as any).mockReturnValue(true);
-    const startChatPromise = startChatSession();
+    const startChatPromise = startChatSession(mockConversation, mockLLM, true, true, false, false);
 
     // Find the line handler
     const lineHandler = mockReadlineInstance.on.mock.calls.find((call) => call[0] === 'line')?.[1];
@@ -217,7 +203,7 @@ describe('chat module', () => {
     const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     (executeCommand as any).mockReturnValue(false);
 
-    const startChatPromise = startChatSession();
+    const startChatPromise = startChatSession(mockConversation, mockLLM, true, true, false, false);
 
     // Find the line handler
     const lineHandler = mockReadlineInstance.on.mock.calls.find((call) => call[0] === 'line')?.[1];

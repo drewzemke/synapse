@@ -84,20 +84,7 @@ async function main() {
       return;
     }
 
-    if (args.chat) {
-      if (args.verbose) {
-        console.log('Starting chat session...');
-      }
-
-      // Get the initial prompt if provided
-      const initialPrompt = args.prompt || args._.join(' ');
-
-      // Start the chat session
-      await startChatSession(initialPrompt || undefined, args.extend, args);
-      return;
-    }
-
-    if (args._.length === 0 && !args.prompt) {
+    if (!args.chat && args._.length === 0 && !args.prompt) {
       console.log('No prompt provided. Use --help for usage information.');
       process.exit(1);
     }
@@ -118,24 +105,6 @@ async function main() {
       // Check for and combine with any piped input
       const prompt = await createPromptWithPipedInput(basePrompt);
 
-      // show diagnostic information in verbose mode
-      if (args.verbose) {
-        console.log(`Processing prompt: "${basePrompt}"\n`);
-        if (prompt !== basePrompt) {
-          console.log('Piped input detected and added to prompt');
-        }
-        console.log(`Using provider: ${model.provider}`);
-        console.log(`Using model: ${model.modelStr}`);
-        console.log(`Using profile: ${profileName || '<none>'}`);
-        console.log(`Profile temperature: ${profile.temperature}`);
-        console.log(`Code coloring: ${printColor ? 'on' : 'off'}`);
-        console.log(`Response streaming: ${streamOutput ? 'on' : 'off'}`);
-        if (args.extend) {
-          console.log('Continuing previous conversation');
-        }
-        console.log('\nResponse:');
-      }
-
       // initialize conversation
       let conversation: Conversation;
 
@@ -155,6 +124,45 @@ async function main() {
             { role: 'user', content: prompt },
           ],
         };
+      }
+
+      // do chat instead if the flag was set
+      if (args.chat) {
+        if (args.verbose) {
+          console.log('Starting chat session...');
+        }
+
+        // Get the initial prompt if provided
+        const hasInitialPrompt = args.prompt !== undefined || args._.join(' ') !== '';
+
+        // Start the chat session
+        await startChatSession(
+          conversation,
+          llm,
+          printColor,
+          streamOutput,
+          args.verbose ?? false,
+          hasInitialPrompt,
+        );
+        return;
+      }
+
+      // show diagnostic information in verbose mode
+      if (args.verbose) {
+        console.log(`Processing prompt: "${basePrompt}"\n`);
+        if (prompt !== basePrompt) {
+          console.log('Piped input detected and added to prompt');
+        }
+        console.log(`Using provider: ${model.provider}`);
+        console.log(`Using model: ${model.modelStr}`);
+        console.log(`Using profile: ${profileName || '<none>'}`);
+        console.log(`Profile temperature: ${profile.temperature}`);
+        console.log(`Code coloring: ${printColor ? 'on' : 'off'}`);
+        console.log(`Response streaming: ${streamOutput ? 'on' : 'off'}`);
+        if (args.extend) {
+          console.log('Continuing previous conversation');
+        }
+        console.log('\nResponse:');
       }
 
       let assistantResponse = '';

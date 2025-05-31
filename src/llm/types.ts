@@ -1,10 +1,4 @@
 /**
- * Types and interfaces for LLM providers
- */
-
-import type { Message } from '../conversation/types';
-
-/**
  * Common options for all LLM providers
  */
 export interface LLMOptions {
@@ -43,34 +37,4 @@ export interface LLMResponse {
     /** Model used for generation */
     model?: string;
   };
-}
-
-/**
- * Interface that all LLM providers must implement
- */
-export interface LLMProvider {
-  /**
-   * Generate text from the LLM
-   * @param messages Array of messages to send to the LLM
-   * @param options Additional options for generation
-   */
-  generateText(messages: Message[], options?: Partial<LLMOptions>): Promise<LLMResponse>;
-
-  /**
-   * Stream text from the LLM
-   * @param messages Array of messages to send to the LLM
-   * @param options Additional options for generation
-   * @param onToken Callback function for each token received
-   */
-  streamText(
-    messages: Message[],
-    options?: Partial<LLMOptions>,
-    onToken?: (token: string) => void,
-  ): AsyncIterable<string>;
-
-  /**
-   * Get token usage information from the last request if available
-   * Note: Not all providers support this functionality
-   */
-  getUsage?(): TokenUsage | undefined;
 }

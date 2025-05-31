@@ -30,6 +30,7 @@
 - [x] Add session management:
   - [x] Save conversation after each chat turn
     - [ ] bug: sometimes conversation is continued even when I haven't passed `-e`
+      - looks like the issue that the command runner doesn't have access to the current convo, so it always loads the most recent convo when you do `/convo`
   - [ ] Properly handle interrupts to ensure conversation state is preserved
 
 - [x] add README section that explains feature in depth
@@ -61,8 +62,8 @@
 - [ ] Add additional commands:
   - [ ] `/clear` - start new conversation
   - [ ] `/verbose` - toggle verbose mode
-  - [ ] `/profile` - set profile mid-conversation
-    - [ ] should autocomplete with available profiles
+  - [ ] `/model` - set model mid-conversation
+    - [ ] should autocomplete with available models
   - [x] `/copy` - copy last response to clipboard
   - [x] `/convo` - view entire conversation so far
 

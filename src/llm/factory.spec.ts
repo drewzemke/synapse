@@ -39,10 +39,4 @@ describe('LLM Factory', () => {
       expect(() => getApiKeyFromEnv('anthropic')).toThrow();
     });
   });
-
-  describe('createLLMProvider', () => {
-    it.todo('creates an LLM object with the provided config');
-
-    it.todo('throws an error for unsupported providers');
-  });
 });
