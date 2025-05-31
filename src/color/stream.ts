@@ -1,7 +1,8 @@
-import * as ansiEscapes from 'ansi-escapes'; // For terminal manipulation
-import type { Conversation } from '../../conversation';
-import type { LLM } from '../../llm';
-import { stopSpinner } from '../spinner';
+import * as ansiEscapes from 'ansi-escapes';
+
+import { stopSpinner } from '../cli/spinner';
+import type { Conversation } from '../conversation';
+import type { LLM } from '../llm';
 import { FALLBACK_LANGUAGE, highlight } from './highlighter';
 
 const CODE_BLOCK_START_REGEX = /```(\w*)?\n/;

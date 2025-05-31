@@ -5,12 +5,12 @@
  * Main entry point for the application
  */
 
+import { startChatSession } from './chat';
 import { parseArgs } from './cli/args';
-import { startChatSession } from './cli/chat';
-import { colorCodeBlocks } from './cli/color';
-import { streamWithCodeColor } from './cli/color/stream';
 import { createPromptWithPipedInput } from './cli/piped-prompt';
 import { startSpinner, stopSpinner } from './cli/spinner';
+import { colorCodeBlocks } from './color';
+import { streamWithCodeColor } from './color/stream';
 import { ConfigManager } from './config';
 import {
   addMessageToConversation,

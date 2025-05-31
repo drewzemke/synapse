@@ -3,6 +3,9 @@
  */
 
 import { createInterface } from 'node:readline';
+import { PROMPT_MARKER } from '../cli/prompt-marker';
+import { startSpinner, stopSpinner } from '../cli/spinner';
+import { streamWithCodeColor } from '../color/stream';
 import {
   addMessageToConversation,
   type Conversation,
@@ -10,10 +13,7 @@ import {
   saveConversation,
 } from '../conversation';
 import type { LLM } from '../llm';
-import { streamWithCodeColor } from './color/stream';
 import { CommandRegistry } from './commands';
-import { PROMPT_MARKER } from './prompt-marker';
-import { startSpinner, stopSpinner } from './spinner';
 
 /**
  * Start an interactive chat session

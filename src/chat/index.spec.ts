@@ -2,10 +2,11 @@
 
 import * as readline from 'node:readline';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { streamWithCodeColor } from '../color/stream';
 import { addMessageToConversation, type Conversation, saveConversation } from '../conversation';
 import type { LLM } from '../llm';
-import { startChatSession } from './chat';
-import { streamWithCodeColor } from './color/stream';
+import { startChatSession } from '.';
 
 // Mock modules
 vi.mock('node:readline', () => ({
@@ -31,11 +32,11 @@ vi.mock('../conversation', () => ({
   saveConversation: vi.fn(),
 }));
 
-vi.mock('./color/stream', () => ({
+vi.mock('../color/stream', () => ({
   streamWithCodeColor: vi.fn(),
 }));
 
-vi.mock('./spinner', () => ({
+vi.mock('../cli/spinner', () => ({
   startSpinner: vi.fn(),
   stopSpinner: vi.fn(),
 }));

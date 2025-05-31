@@ -1,8 +1,9 @@
 import type { Interface as ReadlineInterface } from 'node:readline';
 import clipboardy from 'clipboardy';
+
+import { PROMPT_MARKER } from '../cli/prompt-marker';
+import { colorCodeBlocks } from '../color';
 import type { Conversation } from '../conversation';
-import { colorCodeBlocks } from './color';
-import { PROMPT_MARKER } from './prompt-marker';
 
 export interface Command {
   name: string;
