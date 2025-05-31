@@ -29,8 +29,7 @@
 
 - [x] Add session management:
   - [x] Save conversation after each chat turn
-    - [ ] bug: sometimes conversation is continued even when I haven't passed `-e`
-      - looks like the issue that the command runner doesn't have access to the current convo, so it always loads the most recent convo when you do `/convo`
+    - [x] bug: sometimes conversation is continued even when I haven't passed `-e`
   - [ ] Properly handle interrupts to ensure conversation state is preserved
 
 - [x] add README section that explains feature in depth

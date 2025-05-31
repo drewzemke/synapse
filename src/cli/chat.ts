@@ -11,7 +11,7 @@ import {
 } from '../conversation';
 import type { LLM } from '../llm';
 import { streamWithCodeColor } from './color/stream';
-import { commandRegistry, executeCommand, registerBuiltInCommands } from './commands';
+import { CommandRegistry } from './commands';
 import { PROMPT_MARKER } from './prompt-marker';
 import { startSpinner, stopSpinner } from './spinner';
 
@@ -32,8 +32,14 @@ export async function startChatSession(
   /** If true, start processing without prompting for user input. */
   processImmediately: boolean,
 ): Promise<void> {
+  // Create command registry with conversation reference
+  const commandRegistry = new CommandRegistry(conversation);
+
   // Register built-in commands
-  registerBuiltInCommands();
+  const builtInCommands = commandRegistry.getBuiltInCommands();
+  for (const command of Object.values(builtInCommands)) {
+    commandRegistry.registerCommand(command);
+  }
 
   // Create readline interface for user input with command autocomplete
   const rl = createInterface({
@@ -55,7 +61,16 @@ export async function startChatSession(
     const initialPrompt = conversation.messages.pop()?.content;
     if (initialPrompt) {
       console.log(PROMPT_MARKER, initialPrompt, '\n');
-      await processUserInput(initialPrompt, llm, conversation, printColor, verbose);
+      const updatedConversation = await processUserInput(
+        initialPrompt,
+        llm,
+        conversation,
+        printColor,
+        verbose,
+      );
+      if (updatedConversation) {
+        commandRegistry.updateConversation(updatedConversation);
+      }
       console.log('\n');
     }
   }
@@ -69,9 +84,11 @@ export async function startChatSession(
     // Handle commands that start with /
     if (input.startsWith('/')) {
       const commandName = input.slice(1).split(' ')[0];
-      const commandExecuted = executeCommand(commandName, rl);
+      const command = commandRegistry.getCommand(commandName);
 
-      if (!commandExecuted) {
+      if (command) {
+        command.execute(rl);
+      } else {
         console.log(`Unknown command: ${commandName}`);
         rl.prompt();
       }
@@ -83,7 +100,18 @@ export async function startChatSession(
 
       // Load the latest conversation before processing, since it might have been updated
       const latestConversation = loadLastConversation() || conversation;
-      await processUserInput(input, llm, latestConversation, printColor, verbose);
+      const updatedConversation = await processUserInput(
+        input,
+        llm,
+        latestConversation,
+        printColor,
+        verbose,
+      );
+
+      // Update the command registry with the latest conversation
+      if (updatedConversation) {
+        commandRegistry.updateConversation(updatedConversation);
+      }
 
       // Add extra line break after each message exchange
       console.log('\n');
@@ -109,6 +137,7 @@ export async function startChatSession(
 
 /**
  * Process user input, send to LLM and display response
+ * Returns the updated conversation
  */
 async function processUserInput(
   input: string,
@@ -116,7 +145,7 @@ async function processUserInput(
   conversationParam: Conversation,
   useColor = true,
   verbose = false,
-): Promise<void> {
+): Promise<Conversation | null> {
   let updatedConversation = addMessageToConversation(conversationParam, 'user', input);
 
   startSpinner();
@@ -151,11 +180,14 @@ async function processUserInput(
       console.log('Token usage:');
       console.log(llm.getUsage());
     }
+
+    return updatedConversation;
   } catch (error) {
     stopSpinner();
     console.error(
       'Error getting response:',
       error instanceof Error ? error.message : String(error),
     );
+    return null;
   }
 }

@@ -121,7 +121,7 @@ async function main() {
               ? [{ role: 'system' as const, content: profile.system_prompt }]
               : []),
             // user message
-            { role: 'user', content: prompt },
+            ...(prompt ? [{ role: 'user' as const, content: prompt }] : []),
           ],
         };
       }

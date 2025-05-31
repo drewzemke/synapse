@@ -1,7 +1,7 @@
 import type { Interface as ReadlineInterface } from 'node:readline';
 import clipboardy from 'clipboardy';
 import { configManager } from '../config';
-import { loadLastConversation } from '../conversation';
+import type { Conversation } from '../conversation';
 import { colorCodeBlocks } from './color';
 import { PROMPT_MARKER } from './prompt-marker';
 
@@ -13,6 +13,11 @@ export interface Command {
 
 class CommandRegistry {
   private commands = new Map<string, Command>();
+  private conversation: Conversation;
+
+  constructor(conversation: Conversation) {
+    this.conversation = conversation;
+  }
 
   registerCommand(command: Command): void {
     this.commands.set(command.name, command);
@@ -32,10 +37,10 @@ class CommandRegistry {
         name: 'convo',
         description: 'Show conversation history',
         execute: (rl: ReadlineInterface) => {
-          const conversation = loadLastConversation();
+          const { messages } = this.conversation;
 
-          if (!conversation || conversation.messages.length === 0) {
-            console.log('\nNo conversation history found.');
+          if (messages.length === 0 || (messages.length === 1 && messages[0].role === 'system')) {
+            console.log('\nNo conversation history found.\n');
             rl.prompt();
             return;
           }
@@ -49,20 +54,24 @@ class CommandRegistry {
             process.stdout.isTTY,
           );
 
-          for (const message of conversation.messages) {
-            if (message.role === 'system') {
-              continue; // Skip system messages
+          for (const message of messages) {
+            switch (message.role) {
+              case 'user':
+                if (message.content.length > 0) {
+                  console.log(`${PROMPT_MARKER} ${message.content}`);
+                }
+                break;
+              case 'assistant': {
+                const content = useColor ? colorCodeBlocks(message.content) : message.content;
+                console.log(content);
+                break;
+              }
+              case 'system':
+                // skip printing system messages
+                continue;
             }
 
-            if (message.role === 'user') {
-              console.log(`${PROMPT_MARKER} ${message.content}`);
-            } else {
-              // For assistant messages, apply code coloring if enabled
-              const content = useColor ? colorCodeBlocks(message.content) : message.content;
-              console.log(content);
-            }
-
-            // Add a newline between messages for better readability
+            // newline between messages for better readability
             console.log('');
           }
 
@@ -73,16 +82,14 @@ class CommandRegistry {
         name: 'copy',
         description: 'Copy last response to clipboard',
         execute: (rl: ReadlineInterface) => {
-          const conversation = loadLastConversation();
-
-          if (!conversation || conversation.messages.length === 0) {
+          if (!this.conversation || this.conversation.messages.length === 0) {
             console.log('No conversation found to copy from.');
             rl.prompt();
             return;
           }
 
           // Find the most recent assistant message
-          const lastAssistantMessage = conversation.messages
+          const lastAssistantMessage = this.conversation.messages
             .slice()
             .reverse()
             .find((msg) => msg.role === 'assistant');
@@ -133,33 +140,13 @@ class CommandRegistry {
     return Array.from(this.commands.values());
   }
 
+  updateConversation(conversation: Conversation): void {
+    this.conversation = conversation;
+  }
+
   clear(): void {
     this.commands.clear();
   }
 }
 
-export const commandRegistry = new CommandRegistry();
-
-export function registerCommand(command: Command): void {
-  commandRegistry.registerCommand(command);
-}
-
-export function executeCommand(commandName: string, rl: ReadlineInterface): boolean {
-  const command = commandRegistry.getCommand(commandName);
-
-  if (command) {
-    command.execute(rl);
-    return true;
-  }
-
-  return false;
-}
-
-// Register built-in commands
-export function registerBuiltInCommands(): void {
-  const builtInCommands = commandRegistry.getBuiltInCommands();
-
-  for (const command of Object.values(builtInCommands)) {
-    registerCommand(command);
-  }
-}
+export { CommandRegistry };

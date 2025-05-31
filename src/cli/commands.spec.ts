@@ -1,7 +1,7 @@
 import type * as readline from 'node:readline';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { type Conversation, loadLastConversation } from '../conversation';
-import { commandRegistry, registerCommand } from './commands';
+import type { Conversation } from '../conversation';
+import { CommandRegistry } from './commands';
 
 // Mock clipboardy
 vi.mock('clipboardy', () => ({
@@ -11,12 +11,19 @@ vi.mock('clipboardy', () => ({
 }));
 
 describe('commands', () => {
+  let commandRegistry: CommandRegistry;
+  const mockConversation: Conversation = {
+    profile: 'default',
+    temperature: 0.7,
+    messages: [],
+  };
+
   beforeEach(() => {
-    commandRegistry.clear();
+    commandRegistry = new CommandRegistry(mockConversation);
   });
 
   it('should register commands', () => {
-    registerCommand({
+    commandRegistry.registerCommand({
       name: 'test',
       description: 'A test command',
       execute: vi.fn(),
@@ -27,12 +34,12 @@ describe('commands', () => {
   });
 
   it('should return all command names for completion', () => {
-    registerCommand({
+    commandRegistry.registerCommand({
       name: 'help',
       description: 'Show help',
       execute: vi.fn(),
     });
-    registerCommand({
+    commandRegistry.registerCommand({
       name: 'exit',
       description: 'Exit chat',
       execute: vi.fn(),
@@ -44,17 +51,17 @@ describe('commands', () => {
   });
 
   it('should filter command names for completion', () => {
-    registerCommand({
+    commandRegistry.registerCommand({
       name: 'help',
       description: 'Show help',
       execute: vi.fn(),
     });
-    registerCommand({
+    commandRegistry.registerCommand({
       name: 'exit',
       description: 'Exit chat',
       execute: vi.fn(),
     });
-    registerCommand({
+    commandRegistry.registerCommand({
       name: 'hello',
       description: 'Say hello',
       execute: vi.fn(),
@@ -69,12 +76,12 @@ describe('commands', () => {
   it('should execute the /help command', () => {
     const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-    registerCommand({
+    commandRegistry.registerCommand({
       name: 'help',
       description: 'Show help',
       execute: commandRegistry.getBuiltInCommands().help.execute,
     });
-    registerCommand({
+    commandRegistry.registerCommand({
       name: 'exit',
       description: 'Exit chat',
       execute: vi.fn(),
@@ -100,7 +107,7 @@ describe('commands', () => {
       close: vi.fn(),
     } as unknown as readline.Interface;
 
-    registerCommand({
+    commandRegistry.registerCommand({
       name: 'exit',
       description: 'Exit chat',
       execute: commandRegistry.getBuiltInCommands().exit.execute,
@@ -115,7 +122,7 @@ describe('commands', () => {
   it('should execute the /convo command', () => {
     const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-    const mockConversation: Conversation = {
+    const testConversation: Conversation = {
       profile: 'default',
       temperature: 0.7,
       messages: [
@@ -126,24 +133,24 @@ describe('commands', () => {
       ],
     };
 
-    vi.mock('../conversation');
-    vi.mocked(loadLastConversation).mockReturnValue(mockConversation);
+    // Create a new command registry with the test conversation
+    const testCommandRegistry = new CommandRegistry(testConversation);
 
     const mockRl = {
       prompt: vi.fn(),
     } as unknown as readline.Interface;
 
-    const convoExecute = commandRegistry.getBuiltInCommands().convo.execute;
+    const convoExecute = testCommandRegistry.getBuiltInCommands().convo.execute;
 
     // Register convo command
-    registerCommand({
+    testCommandRegistry.registerCommand({
       name: 'convo',
       description: 'Show conversation history',
       execute: convoExecute,
     });
 
     // Execute convo command
-    const convoCommand = commandRegistry.getCommand('convo');
+    const convoCommand = testCommandRegistry.getCommand('convo');
     convoCommand?.execute(mockRl);
 
     // Verify each message in the conversation was logged
@@ -181,7 +188,7 @@ describe('commands', () => {
     it('should copy the last assistant message to clipboard', async () => {
       const clipboardy = await import('clipboardy');
 
-      const mockConversation: Conversation = {
+      const testConversation: Conversation = {
         profile: 'default',
         temperature: 0.7,
         messages: [
@@ -192,16 +199,16 @@ describe('commands', () => {
         ],
       };
 
-      vi.mocked(loadLastConversation).mockReturnValue(mockConversation);
+      const testCommandRegistry = new CommandRegistry(testConversation);
 
-      const copyExecute = commandRegistry.getBuiltInCommands().copy.execute;
-      registerCommand({
+      const copyExecute = testCommandRegistry.getBuiltInCommands().copy.execute;
+      testCommandRegistry.registerCommand({
         name: 'copy',
         description: 'Copy last response to clipboard',
         execute: copyExecute,
       });
 
-      const copyCommand = commandRegistry.getCommand('copy');
+      const copyCommand = testCommandRegistry.getCommand('copy');
       copyCommand?.execute(mockRl);
 
       expect(clipboardy.default.writeSync).toHaveBeenCalledWith('The answer is 4.');
@@ -210,16 +217,22 @@ describe('commands', () => {
     });
 
     it('should handle no conversation found', async () => {
-      vi.mocked(loadLastConversation).mockReturnValue(undefined);
+      const emptyConversation: Conversation = {
+        profile: 'default',
+        temperature: 0.7,
+        messages: [],
+      };
 
-      const copyExecute = commandRegistry.getBuiltInCommands().copy.execute;
-      registerCommand({
+      const testCommandRegistry = new CommandRegistry(emptyConversation);
+
+      const copyExecute = testCommandRegistry.getBuiltInCommands().copy.execute;
+      testCommandRegistry.registerCommand({
         name: 'copy',
         description: 'Copy last response to clipboard',
         execute: copyExecute,
       });
 
-      const copyCommand = commandRegistry.getCommand('copy');
+      const copyCommand = testCommandRegistry.getCommand('copy');
       copyCommand?.execute(mockRl);
 
       expect(consoleLogSpy).toHaveBeenCalledWith('No conversation found to copy from.');
@@ -227,22 +240,22 @@ describe('commands', () => {
     });
 
     it('should handle empty conversation', async () => {
-      const mockConversation: Conversation = {
+      const emptyConversation: Conversation = {
         profile: 'default',
         temperature: 0.7,
         messages: [],
       };
 
-      vi.mocked(loadLastConversation).mockReturnValue(mockConversation);
+      const testCommandRegistry = new CommandRegistry(emptyConversation);
 
-      const copyExecute = commandRegistry.getBuiltInCommands().copy.execute;
-      registerCommand({
+      const copyExecute = testCommandRegistry.getBuiltInCommands().copy.execute;
+      testCommandRegistry.registerCommand({
         name: 'copy',
         description: 'Copy last response to clipboard',
         execute: copyExecute,
       });
 
-      const copyCommand = commandRegistry.getCommand('copy');
+      const copyCommand = testCommandRegistry.getCommand('copy');
       copyCommand?.execute(mockRl);
 
       expect(consoleLogSpy).toHaveBeenCalledWith('No conversation found to copy from.');
@@ -250,7 +263,7 @@ describe('commands', () => {
     });
 
     it('should handle conversation with no assistant messages', async () => {
-      const mockConversation: Conversation = {
+      const noAssistantConversation: Conversation = {
         profile: 'default',
         temperature: 0.7,
         messages: [
@@ -260,16 +273,16 @@ describe('commands', () => {
         ],
       };
 
-      vi.mocked(loadLastConversation).mockReturnValue(mockConversation);
+      const testCommandRegistry = new CommandRegistry(noAssistantConversation);
 
-      const copyExecute = commandRegistry.getBuiltInCommands().copy.execute;
-      registerCommand({
+      const copyExecute = testCommandRegistry.getBuiltInCommands().copy.execute;
+      testCommandRegistry.registerCommand({
         name: 'copy',
         description: 'Copy last response to clipboard',
         execute: copyExecute,
       });
 
-      const copyCommand = commandRegistry.getCommand('copy');
+      const copyCommand = testCommandRegistry.getCommand('copy');
       copyCommand?.execute(mockRl);
 
       expect(consoleLogSpy).toHaveBeenCalledWith('No assistant message found to copy.');
@@ -279,7 +292,7 @@ describe('commands', () => {
     it('should handle clipboard write failure', async () => {
       const clipboardy = await import('clipboardy');
 
-      const mockConversation: Conversation = {
+      const testConversation: Conversation = {
         profile: 'default',
         temperature: 0.7,
         messages: [
@@ -288,19 +301,19 @@ describe('commands', () => {
         ],
       };
 
-      vi.mocked(loadLastConversation).mockReturnValue(mockConversation);
+      const testCommandRegistry = new CommandRegistry(testConversation);
       vi.mocked(clipboardy.default.writeSync).mockImplementation(() => {
         throw new Error('Clipboard unavailable');
       });
 
-      const copyExecute = commandRegistry.getBuiltInCommands().copy.execute;
-      registerCommand({
+      const copyExecute = testCommandRegistry.getBuiltInCommands().copy.execute;
+      testCommandRegistry.registerCommand({
         name: 'copy',
         description: 'Copy last response to clipboard',
         execute: copyExecute,
       });
 
-      const copyCommand = commandRegistry.getCommand('copy');
+      const copyCommand = testCommandRegistry.getCommand('copy');
       copyCommand?.execute(mockRl);
 
       expect(consoleLogSpy).toHaveBeenCalledWith(
@@ -314,7 +327,7 @@ describe('commands', () => {
       // Reset any previous mock implementation
       vi.mocked(clipboardy.default.writeSync).mockReset();
 
-      const mockConversation: Conversation = {
+      const testConversation: Conversation = {
         profile: 'default',
         temperature: 0.7,
         messages: [
@@ -327,16 +340,16 @@ describe('commands', () => {
         ],
       };
 
-      vi.mocked(loadLastConversation).mockReturnValue(mockConversation);
+      const testCommandRegistry = new CommandRegistry(testConversation);
 
-      const copyExecute = commandRegistry.getBuiltInCommands().copy.execute;
-      registerCommand({
+      const copyExecute = testCommandRegistry.getBuiltInCommands().copy.execute;
+      testCommandRegistry.registerCommand({
         name: 'copy',
         description: 'Copy last response to clipboard',
         execute: copyExecute,
       });
 
-      const copyCommand = commandRegistry.getCommand('copy');
+      const copyCommand = testCommandRegistry.getCommand('copy');
       copyCommand?.execute(mockRl);
 
       expect(clipboardy.default.writeSync).toHaveBeenCalledWith('Most recent answer');
