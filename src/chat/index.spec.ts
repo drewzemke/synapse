@@ -2,8 +2,9 @@
 
 import * as readline from 'node:readline';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
+import { SynapseApp } from '../app';
 import { streamWithCodeColor } from '../color/stream';
+import { ConfigManager } from '../config';
 import { addMessageToConversation, type Conversation, saveConversation } from '../conversation';
 import type { LLM } from '../llm';
 import { startChatSession } from '.';
@@ -72,6 +73,8 @@ describe('chat module', () => {
     messages: [],
   };
 
+  const mockConfig: ConfigManager = new ConfigManager();
+
   beforeEach(() => {
     vi.resetAllMocks();
     (streamWithCodeColor as any).mockResolvedValue('This is a mock LLM response');
@@ -99,7 +102,8 @@ describe('chat module', () => {
       }
     });
 
-    await startChatSession(mockConversation, mockLLM, true, true, false, false);
+    const app = new SynapseApp(mockLLM, mockConversation, mockConfig, { _: [], $0: '' });
+    await startChatSession(app, false);
 
     expect(readline.createInterface).toHaveBeenCalledWith({
       input: process.stdin,
@@ -146,7 +150,8 @@ describe('chat module', () => {
       }
     });
 
-    const chatPromise = startChatSession(mockConversation, mockLLM, true, true, false, false);
+    const app = new SynapseApp(mockLLM, mockConversation, mockConfig, { _: [], $0: '' });
+    const chatPromise = startChatSession(app, false);
 
     // Wait for setup to complete
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -192,7 +197,8 @@ describe('chat module', () => {
       }
     });
 
-    const chatPromise = startChatSession(mockConversation, mockLLM, true, true, false, false);
+    const app = new SynapseApp(mockLLM, mockConversation, mockConfig, { _: [], $0: '' });
+    const chatPromise = startChatSession(app, false);
 
     // Wait for setup to complete
     await new Promise((resolve) => setTimeout(resolve, 0));

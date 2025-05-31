@@ -5,20 +5,14 @@
  * Main entry point for the application
  */
 
+import { SynapseApp } from './app';
 import { startChatSession } from './chat';
 import { parseArgs } from './cli/args';
 import { createPromptWithPipedInput } from './cli/piped-prompt';
-import { startSpinner, stopSpinner } from './cli/spinner';
+import { stopSpinner } from './cli/spinner';
 import { colorCodeBlocks } from './color';
-import { streamWithCodeColor } from './color/stream';
 import { ConfigManager } from './config';
-import {
-  addMessageToConversation,
-  type Conversation,
-  continueConversation,
-  loadLastConversation,
-  saveConversation,
-} from './conversation';
+import { type Conversation, continueConversation, loadLastConversation } from './conversation';
 import { createLLMFromEnv } from './llm';
 
 function printLastMessage(color: boolean) {
@@ -58,16 +52,6 @@ async function main() {
       args.noColor,
       process.stdout.isTTY,
     );
-    const streamOutput = configManager.resolveStreamOutput(
-      args.stream,
-      args.noStream,
-      process.stdout.isTTY,
-    );
-
-    if (args.verbose) {
-      console.log('Synapse CLI initialized');
-      console.log(`Config file path: ${configManager.configFile}`);
-    }
 
     if (args.last) {
       printLastMessage(printColor);
@@ -109,6 +93,10 @@ async function main() {
         };
       }
 
+      const app = new SynapseApp(llm, conversation, configManager, args);
+
+      app.logInit();
+
       // do chat instead if the flag was set
       if (args.chat) {
         if (args.verbose) {
@@ -119,79 +107,15 @@ async function main() {
         const hasInitialPrompt = args.prompt !== undefined || args._.join(' ') !== '';
 
         // Start the chat session
-        await startChatSession(
-          conversation,
-          llm,
-          printColor,
-          streamOutput,
-          args.verbose ?? false,
-          hasInitialPrompt,
-        );
+        await startChatSession(app, hasInitialPrompt);
         return;
       }
 
-      // show diagnostic information in verbose mode
-      if (args.verbose) {
-        console.log(`Processing prompt: "${basePrompt}"\n`);
-        if (prompt !== basePrompt) {
-          console.log('Piped input detected and added to prompt');
-        }
-        console.log(`Using provider: ${model.provider}`);
-        console.log(`Using model: ${model.modelStr}`);
-        console.log(`Using profile: ${profileName || '<none>'}`);
-        console.log(`Profile temperature: ${profile.temperature}`);
-        console.log(`Code coloring: ${printColor ? 'on' : 'off'}`);
-        console.log(`Response streaming: ${streamOutput ? 'on' : 'off'}`);
-        if (args.extend) {
-          console.log('Continuing previous conversation');
-        }
-        console.log('\nResponse:');
-      }
+      app.logProcessing(prompt);
 
-      let assistantResponse = '';
+      await app.runLLM();
 
-      // TODO: clean this up
-      if (streamOutput) {
-        if (printColor) {
-          startSpinner();
-          assistantResponse = await streamWithCodeColor(llm, conversation);
-        } else {
-          // normal streaming, no color
-          startSpinner();
-          let firstChunk = true;
-          for await (const chunk of llm.streamText(conversation.messages)) {
-            if (firstChunk) {
-              firstChunk = false;
-              stopSpinner();
-            }
-            process.stdout.write(chunk);
-            assistantResponse += chunk;
-          }
-        }
-        console.log('\n');
-      } else {
-        // generate the full response without streaming
-        startSpinner();
-        assistantResponse = await llm.generateText(conversation.messages);
-        stopSpinner();
-        if (printColor) {
-          console.log(colorCodeBlocks(assistantResponse));
-        } else {
-          console.log(assistantResponse);
-        }
-      }
-
-      // add new response to conversation and save
-      conversation = addMessageToConversation(conversation, 'assistant', assistantResponse);
-      saveConversation(conversation);
-
-      // show token usage if available and verbose is enabled
-      // TODO: better printing?
-      if (args.verbose && llm.getUsage) {
-        console.log('------------');
-        console.log('Token usage:');
-        console.log(llm.getUsage());
-      }
+      app.logUsage();
     } catch (error) {
       stopSpinner();
 

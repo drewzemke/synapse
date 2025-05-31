@@ -3,16 +3,9 @@
  */
 
 import { createInterface } from 'node:readline';
+import type { SynapseApp } from '../app';
 import { PROMPT_MARKER } from '../cli/prompt-marker';
-import { startSpinner, stopSpinner } from '../cli/spinner';
-import { streamWithCodeColor } from '../color/stream';
-import {
-  addMessageToConversation,
-  type Conversation,
-  loadLastConversation,
-  saveConversation,
-} from '../conversation';
-import type { LLM } from '../llm';
+import { addMessageToConversation } from '../conversation';
 import { CommandRegistry } from './commands';
 
 /**
@@ -23,17 +16,12 @@ import { CommandRegistry } from './commands';
  * @param args - Command line arguments
  */
 export async function startChatSession(
-  conversation: Conversation,
-  llm: LLM,
-  printColor: boolean,
-  // FIXME: respect this config
-  _streamOutput: boolean,
-  verbose: boolean,
+  app: SynapseApp,
   /** If true, start processing without prompting for user input. */
   processImmediately: boolean,
 ): Promise<void> {
   // Create command registry with conversation reference
-  const commandRegistry = new CommandRegistry(conversation);
+  const commandRegistry = new CommandRegistry(app.conversation);
 
   // Register built-in commands
   const builtInCommands = commandRegistry.getBuiltInCommands();
@@ -58,20 +46,13 @@ export async function startChatSession(
 
   // If an initial prompt is provided, process it
   if (processImmediately) {
-    const initialPrompt = conversation.messages.pop()?.content;
+    const initialPrompt = app.conversation.messages.pop()?.content;
     if (initialPrompt) {
       console.log(PROMPT_MARKER, initialPrompt, '\n');
-      const updatedConversation = await processUserInput(
-        initialPrompt,
-        llm,
-        conversation,
-        printColor,
-        verbose,
-      );
-      if (updatedConversation) {
-        commandRegistry.updateConversation(updatedConversation);
-      }
-      console.log('\n');
+      app.logProcessing(initialPrompt);
+      app.conversation = addMessageToConversation(app.conversation, 'user', initialPrompt);
+      await app.runLLM();
+      app.logUsage();
     }
   }
 
@@ -97,97 +78,24 @@ export async function startChatSession(
 
     if (input) {
       console.log('');
-
-      // Load the latest conversation before processing, since it might have been updated
-      const latestConversation = loadLastConversation() || conversation;
-      const updatedConversation = await processUserInput(
-        input,
-        llm,
-        latestConversation,
-        printColor,
-        verbose,
-      );
-
-      // Update the command registry with the latest conversation
-      if (updatedConversation) {
-        commandRegistry.updateConversation(updatedConversation);
-      }
-
-      // Add extra line break after each message exchange
-      console.log('\n');
+      app.conversation = addMessageToConversation(app.conversation, 'user', input);
+      await app.runLLM();
+      app.logUsage();
     }
-
     rl.prompt();
   });
 
   // Handle CTRL+C for proper exit
   rl.on('SIGINT', () => {
-    console.log('\nExiting chat.');
     rl.close();
   });
 
   rl.on('close', () => {
-    console.log('Chat session ended.');
-    // Don't call process.exit() during tests
+    console.log('\n\nChat session ended. See you soon!');
+
+    // don't call process.exit() during tests
     if (process.env.NODE_ENV !== 'test') {
       process.exit(0);
     }
   });
-}
-
-/**
- * Process user input, send to LLM and display response
- * Returns the updated conversation
- */
-async function processUserInput(
-  input: string,
-  llm: LLM,
-  conversationParam: Conversation,
-  useColor = true,
-  verbose = false,
-): Promise<Conversation | null> {
-  let updatedConversation = addMessageToConversation(conversationParam, 'user', input);
-
-  startSpinner();
-
-  try {
-    let response: string;
-
-    if (useColor) {
-      response = await streamWithCodeColor(llm, updatedConversation);
-    } else {
-      response = '';
-      let firstChunk = true;
-      for await (const chunk of llm.streamText(updatedConversation.messages)) {
-        if (firstChunk) {
-          firstChunk = false;
-          stopSpinner();
-        }
-        process.stdout.write(chunk);
-        response += chunk;
-      }
-      console.log();
-    }
-
-    updatedConversation = addMessageToConversation(updatedConversation, 'assistant', response);
-
-    // Save updated conversation
-    saveConversation(updatedConversation);
-
-    // Show token usage if verbose mode is enabled
-    if (verbose && llm.getUsage) {
-      console.log('\n------------');
-      console.log('Token usage:');
-      console.log(llm.getUsage());
-    }
-
-    return updatedConversation;
-  } catch (error) {
-    stopSpinner();
-    console.error(
-      'Error getting response:',
-      error instanceof Error ? error.message : String(error),
-    );
-    return null;
-  }
 }

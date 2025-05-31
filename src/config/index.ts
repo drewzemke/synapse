@@ -93,6 +93,7 @@ export class ConfigManager {
    * @param profileName The name of the profile to get
    * @returns The profile, or the default profile if not found
    */
+  // TODO: make this private, compute and store model privately
   public getProfile(profileName?: string): Profile {
     if (!this.configLoaded) {
       this.loadConfig();
@@ -120,6 +121,7 @@ export class ConfigManager {
    * @param modelName The name of the model to get
    * @returns The model, or the default model if not found
    */
+  // TODO: make this private, compute and store model privately
   public getModel(modelName?: string): ModelSpec {
     if (!this.configLoaded) {
       this.loadConfig();
