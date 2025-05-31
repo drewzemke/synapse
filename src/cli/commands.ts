@@ -1,6 +1,5 @@
 import type { Interface as ReadlineInterface } from 'node:readline';
 import clipboardy from 'clipboardy';
-import { configManager } from '../config';
 import type { Conversation } from '../conversation';
 import { colorCodeBlocks } from './color';
 import { PROMPT_MARKER } from './prompt-marker';
@@ -48,11 +47,13 @@ class CommandRegistry {
           console.log('\nConversation History:');
           console.log('---------------------\n');
 
-          const useColor = configManager.resolveColorOutput(
-            undefined,
-            undefined,
-            process.stdout.isTTY,
-          );
+          // const useColor = configManager.resolveColorOutput(
+          //   undefined,
+          //   undefined,
+          //   process.stdout.isTTY,
+          // );
+          // FIXME: read this from config
+          const useColor = true;
 
           for (const message of messages) {
             switch (message.role) {

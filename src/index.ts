@@ -11,7 +11,7 @@ import { colorCodeBlocks } from './cli/color';
 import { streamWithCodeColor } from './cli/color/stream';
 import { createPromptWithPipedInput } from './cli/piped-prompt';
 import { startSpinner, stopSpinner } from './cli/spinner';
-import { configManager } from './config';
+import { ConfigManager } from './config';
 import {
   addMessageToConversation,
   type Conversation,
@@ -20,18 +20,6 @@ import {
   saveConversation,
 } from './conversation';
 import { createLLMFromEnv } from './llm';
-
-function loadConfiguration() {
-  try {
-    configManager.loadConfig();
-  } catch (error) {
-    console.error(
-      'Error loading configuration:',
-      error instanceof Error ? error.message : String(error),
-    );
-    process.exit(1);
-  }
-}
 
 function printLastMessage(color: boolean) {
   const lastConversation = loadLastConversation();
@@ -61,8 +49,10 @@ async function main() {
     const args = parseArgs(process.argv.slice(2));
 
     // Load configuration
-    loadConfiguration();
+    const configManager = new ConfigManager();
+    configManager.loadConfig();
 
+    // TODO: encapsulate these in config
     const printColor = configManager.resolveColorOutput(
       args.color,
       args.noColor,

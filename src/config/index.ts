@@ -51,18 +51,19 @@ export class ConfigManager {
         this.configLoaded = true;
       }
     } catch (error) {
-      // If there's an error parsing the config file, throw an error
+      // if there's an error parsing the config file, throw an error
       if (error instanceof Error && error.message.includes('Parse error')) {
         throw new Error(`Invalid configuration file format: ${error.message}`);
       }
-      // For other errors, use default config
-      this.config = { ...DEFAULT_CONFIG };
-      this.configLoaded = false;
 
-      // Re-throw unexpected errors
+      // re-throw other unexpected errors
       if (!(error instanceof Error && 'code' in error && error.code === 'ENOENT')) {
         throw error;
       }
+
+      // for other errors, use default config
+      this.config = { ...DEFAULT_CONFIG };
+      this.configLoaded = false;
     }
 
     return this.config;
@@ -190,9 +191,6 @@ export class ConfigManager {
     }
   }
 }
-
-// Export a singleton instance of the config manager
-export const configManager = new ConfigManager();
 
 export * from './schemas';
 // Export types and schemas
