@@ -11,7 +11,7 @@
     "sy": "dist/index.js"
   },
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.js --format=cjs --minify",
+    "build": "node ./esbuild.mjs",
     "check": "tsc --noEmit",
     "dev": "tsx src/index.ts",
     "lint": "biome check .",
