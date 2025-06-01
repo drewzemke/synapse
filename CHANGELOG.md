@@ -1,3 +1,10 @@
+## [1.13.2](https://github.com/drewzemke/synapse/compare/v1.13.1...v1.13.2) (2025-06-01)
+
+
+### Bug Fixes
+
+* **config:** resolve stream and color args in config rather than exposing functions that do that ([e0111a8](https://github.com/drewzemke/synapse/commit/e0111a88ad6dc1d5c2b2e82237bc7eff7a51ed2a))
+
 ## [1.13.1](https://github.com/drewzemke/synapse/compare/v1.13.0...v1.13.1) (2025-06-01)
 
 
