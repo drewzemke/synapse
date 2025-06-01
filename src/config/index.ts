@@ -5,6 +5,7 @@
 import fs from 'node:fs';
 import { parse as parseToml } from 'toml';
 import { fromZodError } from 'zod-validation-error';
+import type { SynapseArgs } from '../cli/args';
 import { getConfigPaths } from './paths';
 import {
   DEFAULT_CONFIG,
@@ -20,35 +21,31 @@ import type { ModelSpec, Profile, SynapseConfig } from './types';
 export class ConfigManager {
   private config: SynapseConfig = DEFAULT_CONFIG;
   private configPaths = getConfigPaths();
-  private configLoaded = false;
 
   /**
    * Load configuration from file
    * If the file doesn't exist, it will use default configuration
    * @returns The loaded configuration
    */
-  public loadConfig(): SynapseConfig {
+  public loadConfig(args: SynapseArgs): SynapseConfig {
     try {
-      // Create config directory if it doesn't exist
+      // create config directory if it doesn't exist
       this.ensureConfigDir();
 
-      // Check if config file exists
       if (fs.existsSync(this.configPaths.configFile)) {
-        // Read and parse the config file
+        // parse toml file
         const configString = fs.readFileSync(this.configPaths.configFile, 'utf-8');
         const configObj = parseToml(configString);
 
+        // parse config object
         const parseResult = SynapseConfigSchema.safeParse(configObj);
         if (!parseResult.success) {
           throw new Error(fromZodError(parseResult.error).toString());
         }
         this.config = parseResult.data;
-
-        this.configLoaded = true;
       } else {
-        // If file doesn't exist, use default config
+        // if file doesn't exist, use default config
         this.config = { ...DEFAULT_CONFIG };
-        this.configLoaded = true;
       }
     } catch (error) {
       // if there's an error parsing the config file, throw an error
@@ -63,28 +60,19 @@ export class ConfigManager {
 
       // for other errors, use default config
       this.config = { ...DEFAULT_CONFIG };
-      this.configLoaded = false;
     }
 
-    return this.config;
-  }
+    // resolve color and stream settings with the config settings
+    this.resolveColorOutput(args.color, args.noColor);
+    this.resolveStreamOutput(args.stream, args.noStream);
 
-  /**
-   * Get the current configuration
-   * If configuration hasn't been loaded yet, it will load it first
-   * @returns The current configuration
-   */
-  public getConfig(): SynapseConfig {
-    if (!this.configLoaded) {
-      return this.loadConfig();
-    }
     return this.config;
   }
 
   /**
    * Get the path to the config file.
    */
-  get configFile() {
+  get configFilePath() {
     return this.configPaths.configFile;
   }
 
@@ -95,17 +83,11 @@ export class ConfigManager {
    */
   // TODO: make this private, compute and store model privately
   public getProfile(profileName?: string): Profile {
-    if (!this.configLoaded) {
-      this.loadConfig();
-    }
-
     if (!profileName) {
       // fall back to the default profile defined in the config,
       // or the built-in default if that fails
-      // FIXME: this sucks
-      return this.config.general.default_profile
-        ? (this.config.profiles?.[this.config.general.default_profile] ?? DEFAULT_PROFILE)
-        : DEFAULT_PROFILE;
+      const defaultProfName = this.config.general.default_profile;
+      return this.config.profiles?.[defaultProfName] ?? DEFAULT_PROFILE;
     }
 
     // If the user requested a profile that they have not defined, throw an error
@@ -123,10 +105,6 @@ export class ConfigManager {
    */
   // TODO: make this private, compute and store model privately
   public getModel(modelName?: string): ModelSpec {
-    if (!this.configLoaded) {
-      this.loadConfig();
-    }
-
     if (modelName) {
       // If a model name is explicitly provided, try to get it
       if (!this.config.models?.[modelName]) {
@@ -151,36 +129,42 @@ export class ConfigManager {
    * Resolve whether to use color output based on CLI args and config
    * @param colorArg CLI --color flag value
    * @param noColorArg CLI --no-color flag value
-   * @param isTTY Whether output is a TTY
-   * @returns Whether to use color output
    */
-  public resolveColorOutput(colorArg?: boolean, noColorArg?: boolean, isTTY = true): boolean {
-    const config = this.getConfig();
+  private resolveColorOutput(colorArg?: boolean, noColorArg?: boolean) {
+    let color: boolean | undefined;
 
-    // Check if explicitly specified in CLI args
-    if (colorArg !== undefined) return colorArg;
-    if (noColorArg !== undefined) return !noColorArg;
+    // check if explicitly specified in CLI args
+    if (colorArg !== undefined) {
+      color = true;
+    } else if (noColorArg !== undefined) {
+      color = false;
+    } else {
+      console.log(process.stdout.isTTY);
+      color = process.stdout.isTTY && this.config.general.color;
+    }
 
-    // Otherwise use config default (only if TTY)
-    return isTTY && config.general.color;
+    this.config.general.color = color ?? false;
   }
 
   /**
    * Resolve whether to stream output based on CLI args and config
    * @param streamArg CLI --stream flag value
    * @param noStreamArg CLI --no-stream flag value
-   * @param isTTY Whether output is a TTY
-   * @returns Whether to stream output
    */
-  public resolveStreamOutput(streamArg?: boolean, noStreamArg?: boolean, isTTY = true): boolean {
-    const config = this.getConfig();
+  private resolveStreamOutput(streamArg?: boolean, noStreamArg?: boolean) {
+    let stream: boolean | undefined;
 
-    // Check if explicitly specified in CLI args
-    if (streamArg !== undefined) return streamArg;
-    if (noStreamArg !== undefined) return !noStreamArg;
+    // check if explicitly specified in CLI args
+    if (streamArg !== undefined) {
+      stream = true;
+    } else if (noStreamArg !== undefined) {
+      stream = false;
+    } else {
+      console.log(process.stdout.isTTY);
+      stream = process.stdout.isTTY && this.config.general.stream;
+    }
 
-    // Otherwise use config default (only if TTY)
-    return isTTY && config.general.stream;
+    this.config.general.stream = stream ?? false;
   }
 
   /**
@@ -191,6 +175,14 @@ export class ConfigManager {
     if (!fs.existsSync(this.configPaths.configDir)) {
       fs.mkdirSync(this.configPaths.configDir, { recursive: true });
     }
+  }
+
+  showColor(): boolean {
+    return this.config.general.color;
+  }
+
+  streamOutput(): boolean {
+    return this.config.general.stream;
   }
 }
 

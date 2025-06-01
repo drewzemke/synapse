@@ -21,7 +21,7 @@ export async function startChatSession(
   processImmediately: boolean,
 ): Promise<void> {
   // Create command registry with conversation reference
-  const commandRegistry = new CommandRegistry(app.conversation);
+  const commandRegistry = new CommandRegistry(app.conversation, app.config);
 
   // Register built-in commands
   const builtInCommands = commandRegistry.getBuiltInCommands();
@@ -91,11 +91,10 @@ export async function startChatSession(
   });
 
   rl.on('close', () => {
-    console.log('\n\nChat session ended. See you soon!');
+    // don't do anything in tests
+    if (process.env.NODE_ENV === 'test') return;
 
-    // don't call process.exit() during tests
-    if (process.env.NODE_ENV !== 'test') {
-      process.exit(0);
-    }
+    console.log('\n\nChat session ended. See you soon!');
+    process.exit(0);
   });
 }

@@ -3,6 +3,7 @@ import clipboardy from 'clipboardy';
 
 import { PROMPT_MARKER } from '../cli/prompt-marker';
 import { colorCodeBlocks } from '../color';
+import type { ConfigManager } from '../config';
 import type { Conversation } from '../conversation';
 
 export interface Command {
@@ -13,11 +14,11 @@ export interface Command {
 
 class CommandRegistry {
   private commands = new Map<string, Command>();
-  private conversation: Conversation;
 
-  constructor(conversation: Conversation) {
-    this.conversation = conversation;
-  }
+  constructor(
+    private conversation: Conversation,
+    private config: ConfigManager,
+  ) {}
 
   registerCommand(command: Command): void {
     this.commands.set(command.name, command);
@@ -48,14 +49,6 @@ class CommandRegistry {
           console.log('\nConversation History:');
           console.log('---------------------\n');
 
-          // const useColor = configManager.resolveColorOutput(
-          //   undefined,
-          //   undefined,
-          //   process.stdout.isTTY,
-          // );
-          // FIXME: read this from config
-          const useColor = true;
-
           for (const message of messages) {
             switch (message.role) {
               case 'user':
@@ -64,7 +57,9 @@ class CommandRegistry {
                 }
                 break;
               case 'assistant': {
-                const content = useColor ? colorCodeBlocks(message.content) : message.content;
+                const content = this.config.showColor()
+                  ? colorCodeBlocks(message.content)
+                  : message.content;
                 console.log(content);
                 break;
               }

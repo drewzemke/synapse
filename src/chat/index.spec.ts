@@ -78,6 +78,7 @@ describe('chat module', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     (streamWithCodeColor as any).mockResolvedValue('This is a mock LLM response');
+    vi.spyOn(ConfigManager.prototype, 'showColor').mockReturnValue(true);
   });
 
   afterEach(() => {

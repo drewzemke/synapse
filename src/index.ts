@@ -43,18 +43,11 @@ async function main() {
     const args = parseArgs(process.argv.slice(2));
 
     // Load configuration
-    const configManager = new ConfigManager();
-    configManager.loadConfig();
-
-    // TODO: encapsulate these in config
-    const printColor = configManager.resolveColorOutput(
-      args.color,
-      args.noColor,
-      process.stdout.isTTY,
-    );
+    const config = new ConfigManager();
+    config.loadConfig(args);
 
     if (args.last) {
-      printLastMessage(printColor);
+      printLastMessage(config.showColor());
       return;
     }
 
@@ -65,9 +58,9 @@ async function main() {
 
     try {
       const profileName = args.profile;
-      const profile = configManager.getProfile(profileName);
+      const profile = config.getProfile(profileName);
 
-      const model = configManager.getModel(args.model);
+      const model = config.getModel(args.model);
       const llm = createLLMFromEnv(model);
 
       const basePrompt = args.prompt || args._.join(' ');
@@ -93,7 +86,7 @@ async function main() {
         };
       }
 
-      const app = new SynapseApp(llm, conversation, configManager, args);
+      const app = new SynapseApp(llm, conversation, config, args);
 
       app.logInit();
 

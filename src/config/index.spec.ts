@@ -1,10 +1,10 @@
 import fs from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { SynapseArgs } from '../cli/args';
 import { ConfigManager } from './index';
 import { getConfigPaths } from './paths';
 import { DEFAULT_CONFIG, DEFAULT_MODEL_ANTHROPIC, DEFAULT_PROFILE } from './schemas';
 
-// Mock fs module
 vi.mock('node:fs', () => ({
   default: {
     existsSync: vi.fn(),
@@ -13,10 +13,11 @@ vi.mock('node:fs', () => ({
   },
 }));
 
-// Mock path module
 vi.mock('./paths', () => ({
   getConfigPaths: vi.fn(),
 }));
+
+const fakeArgs: () => SynapseArgs = () => ({ $0: '', _: [] });
 
 describe('ConfigManager', () => {
   const mockConfigPaths = {
@@ -62,7 +63,7 @@ describe('ConfigManager', () => {
     vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
 
     const configManager = new ConfigManager();
-    const config = configManager.loadConfig();
+    const config = configManager.loadConfig(fakeArgs());
 
     expect(config).toMatchObject({
       general: {
@@ -99,7 +100,7 @@ describe('ConfigManager', () => {
     vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
 
     const configManager = new ConfigManager();
-    const config = configManager.loadConfig();
+    const config = configManager.loadConfig(fakeArgs());
 
     // Custom profile should have custom system prompt but default temperature
     expect(config.profiles?.custom).toMatchObject({
@@ -113,7 +114,7 @@ describe('ConfigManager', () => {
     vi.mocked(fs.existsSync).mockReturnValue(false);
 
     const configManager = new ConfigManager();
-    const config = configManager.loadConfig();
+    const config = configManager.loadConfig(fakeArgs());
 
     expect(config).toEqual(DEFAULT_CONFIG);
   });
@@ -125,7 +126,7 @@ describe('ConfigManager', () => {
 
     const configManager = new ConfigManager();
 
-    expect(() => configManager.loadConfig()).toThrow('Invalid configuration file format');
+    expect(() => configManager.loadConfig(fakeArgs())).toThrow('Invalid configuration file format');
   });
 
   describe('getProfile', () => {
@@ -139,7 +140,7 @@ describe('ConfigManager', () => {
       vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
 
       const configManager = new ConfigManager();
-      configManager.loadConfig();
+      configManager.loadConfig(fakeArgs());
 
       const profile = configManager.getProfile('test');
 
@@ -159,7 +160,7 @@ describe('ConfigManager', () => {
       vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
 
       const configManager = new ConfigManager();
-      configManager.loadConfig();
+      configManager.loadConfig(fakeArgs());
 
       expect(() => configManager.getProfile('nonexistent')).toThrow(
         "Profile 'nonexistent' not found",
@@ -176,7 +177,7 @@ describe('ConfigManager', () => {
       vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
 
       const configManager = new ConfigManager();
-      configManager.loadConfig();
+      configManager.loadConfig(fakeArgs());
 
       const profile = configManager.getProfile();
 
@@ -200,7 +201,7 @@ describe('ConfigManager', () => {
       vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
 
       const configManager = new ConfigManager();
-      configManager.loadConfig();
+      configManager.loadConfig(fakeArgs());
 
       const model = configManager.getModel('claude');
 
@@ -220,7 +221,7 @@ describe('ConfigManager', () => {
       vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
 
       const configManager = new ConfigManager();
-      configManager.loadConfig();
+      configManager.loadConfig(fakeArgs());
 
       const model = configManager.getModel();
 
@@ -237,7 +238,7 @@ describe('ConfigManager', () => {
       vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
 
       const configManager = new ConfigManager();
-      configManager.loadConfig();
+      configManager.loadConfig(fakeArgs());
 
       expect(() => configManager.getModel('nonexistent')).toThrow("Model 'nonexistent' not found");
     });
@@ -256,7 +257,7 @@ describe('ConfigManager', () => {
       vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
 
       const configManager = new ConfigManager();
-      expect(() => configManager.loadConfig()).toThrow(/validation error/i);
+      expect(() => configManager.loadConfig(fakeArgs())).toThrow(/validation error/i);
     });
 
     it('throw errors for models with missing required fields', () => {
@@ -275,7 +276,7 @@ describe('ConfigManager', () => {
       vi.mocked(fs.readFileSync).mockReturnValue(mockConfig);
 
       const configManager = new ConfigManager();
-      expect(() => configManager.loadConfig()).toThrow(/validation error/i);
+      expect(() => configManager.loadConfig(fakeArgs())).toThrow(/validation error/i);
     });
   });
 });

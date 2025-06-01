@@ -17,7 +17,7 @@ export class SynapseApp {
   constructor(
     private llm: LLM,
     public conversation: Conversation,
-    private config: ConfigManager,
+    public config: ConfigManager,
     args: SynapseArgs,
   ) {
     this.verbose = args.verbose ?? false;
@@ -28,12 +28,8 @@ export class SynapseApp {
   async runLLM() {
     let assistantResponse = '';
 
-    // FIXME: read from config
-    const streamOutput = true;
-    const printColor = true;
-
-    if (streamOutput) {
-      if (printColor) {
+    if (this.config.streamOutput()) {
+      if (this.config.showColor()) {
         startSpinner();
         assistantResponse = await streamWithCodeColor(this.llm, this.conversation);
       } else {
@@ -56,7 +52,7 @@ export class SynapseApp {
       assistantResponse = await this.llm.generateText(this.conversation.messages);
       stopSpinner();
 
-      if (printColor) {
+      if (this.config.showColor()) {
         console.log(colorCodeBlocks(assistantResponse));
       } else {
         console.log(assistantResponse);
@@ -72,7 +68,7 @@ export class SynapseApp {
     if (!this.verbose) return;
 
     console.log('Synapse CLI initialized');
-    console.log(`Config file path: ${this.config.configFile}`);
+    console.log(`Config file path: ${this.config.configFilePath}`);
   }
 
   logProcessing(prompt: string) {
