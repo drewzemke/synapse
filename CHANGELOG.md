@@ -1,3 +1,14 @@
+## [1.13.1](https://github.com/drewzemke/synapse/compare/v1.13.0...v1.13.1) (2025-06-01)
+
+
+### Bug Fixes
+
+* build issues ([0abf4ab](https://github.com/drewzemke/synapse/commit/0abf4ab4116d4d7741daea597ec0af6186d2775d))
+* **chat:** fix loading of existing conversation when `-e` was not passed ([e88e356](https://github.com/drewzemke/synapse/commit/e88e35685d9ed2c87c01cb07caea596d0ef5da06))
+* **cli:** stop spinner when errors occur ([d9e932e](https://github.com/drewzemke/synapse/commit/d9e932e784e7c65d69d740b376398c3beb52b158))
+* more build issues ([7676eff](https://github.com/drewzemke/synapse/commit/7676eff4218c3b6a7e4dca102f56eca60f523010))
+* **pipeline:** don't test node 18 ([752e098](https://github.com/drewzemke/synapse/commit/752e0988221df1933558117abb9f6afc8a687951))
+
 # [1.13.0](https://github.com/drewzemke/synapse/compare/v1.12.0...v1.13.0) (2025-05-30)
 
 
