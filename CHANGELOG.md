@@ -1,3 +1,10 @@
+## [1.13.3](https://github.com/drewzemke/synapse/compare/v1.13.2...v1.13.3) (2025-06-01)
+
+
+### Bug Fixes
+
+* remove console logs ([1b51f94](https://github.com/drewzemke/synapse/commit/1b51f94702968a5c83bda1bd322d7ebc8f1e9a0a))
+
 ## [1.13.2](https://github.com/drewzemke/synapse/compare/v1.13.1...v1.13.2) (2025-06-01)
 
 
