@@ -1,3 +1,15 @@
+# [1.14.0](https://github.com/drewzemke/synapse/compare/v1.13.3...v1.14.0) (2025-06-01)
+
+
+### Bug Fixes
+
+* **args:** handle --no-stream and --no-color args correctly ([0d789e2](https://github.com/drewzemke/synapse/commit/0d789e2870418dace7b29165fae0fc8daa46e5ee))
+
+
+### Features
+
+* **cli:** fix printing of blank lines in terminal output ([cd931c5](https://github.com/drewzemke/synapse/commit/cd931c5974b0863a66fa9b543c8a646c7cfcfe4e))
+
 ## [1.13.3](https://github.com/drewzemke/synapse/compare/v1.13.2...v1.13.3) (2025-06-01)
 
 
