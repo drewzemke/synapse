@@ -1,7 +1,10 @@
 import type * as readline from 'node:readline';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { SynapseApp } from '../app';
 import { ConfigManager } from '../config';
 import type { Conversation } from '../conversation';
+import type { LLM } from '../llm';
 import { CommandRegistry } from './commands';
 
 // Mock clipboardy
@@ -20,8 +23,14 @@ describe('commands', () => {
   };
   const mockConfig: ConfigManager = new ConfigManager();
 
+  const mockApp = (convo = mockConversation) =>
+    new SynapseApp({} as LLM, convo, mockConfig, {
+      $0: '',
+      _: [],
+    });
+
   beforeEach(() => {
-    commandRegistry = new CommandRegistry(mockConversation, mockConfig);
+    commandRegistry = new CommandRegistry(mockApp());
   });
 
   it('should register commands', () => {
@@ -136,7 +145,7 @@ describe('commands', () => {
     };
 
     // Create a new command registry with the test conversation
-    const testCommandRegistry = new CommandRegistry(testConversation, mockConfig);
+    const testCommandRegistry = new CommandRegistry(mockApp(testConversation));
 
     const mockRl = {
       prompt: vi.fn(),
@@ -201,7 +210,7 @@ describe('commands', () => {
         ],
       };
 
-      const testCommandRegistry = new CommandRegistry(testConversation, mockConfig);
+      const testCommandRegistry = new CommandRegistry(mockApp(testConversation));
 
       const copyExecute = testCommandRegistry.getBuiltInCommands().copy.execute;
       testCommandRegistry.registerCommand({
@@ -225,7 +234,7 @@ describe('commands', () => {
         messages: [],
       };
 
-      const testCommandRegistry = new CommandRegistry(emptyConversation, mockConfig);
+      const testCommandRegistry = new CommandRegistry(mockApp(emptyConversation));
 
       const copyExecute = testCommandRegistry.getBuiltInCommands().copy.execute;
       testCommandRegistry.registerCommand({
@@ -248,7 +257,7 @@ describe('commands', () => {
         messages: [],
       };
 
-      const testCommandRegistry = new CommandRegistry(emptyConversation, mockConfig);
+      const testCommandRegistry = new CommandRegistry(mockApp(emptyConversation));
 
       const copyExecute = testCommandRegistry.getBuiltInCommands().copy.execute;
       testCommandRegistry.registerCommand({
@@ -275,7 +284,7 @@ describe('commands', () => {
         ],
       };
 
-      const testCommandRegistry = new CommandRegistry(noAssistantConversation, mockConfig);
+      const testCommandRegistry = new CommandRegistry(mockApp(noAssistantConversation));
 
       const copyExecute = testCommandRegistry.getBuiltInCommands().copy.execute;
       testCommandRegistry.registerCommand({
@@ -303,7 +312,7 @@ describe('commands', () => {
         ],
       };
 
-      const testCommandRegistry = new CommandRegistry(testConversation, mockConfig);
+      const testCommandRegistry = new CommandRegistry(mockApp(testConversation));
       vi.mocked(clipboardy.default.writeSync).mockImplementation(() => {
         throw new Error('Clipboard unavailable');
       });
@@ -342,7 +351,7 @@ describe('commands', () => {
         ],
       };
 
-      const testCommandRegistry = new CommandRegistry(testConversation, mockConfig);
+      const testCommandRegistry = new CommandRegistry(mockApp(testConversation));
 
       const copyExecute = testCommandRegistry.getBuiltInCommands().copy.execute;
       testCommandRegistry.registerCommand({

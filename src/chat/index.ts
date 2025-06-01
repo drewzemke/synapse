@@ -21,7 +21,7 @@ export async function startChatSession(
   processImmediately: boolean,
 ): Promise<void> {
   // Create command registry with conversation reference
-  const commandRegistry = new CommandRegistry(app.conversation, app.config);
+  const commandRegistry = new CommandRegistry(app);
 
   // Register built-in commands
   const builtInCommands = commandRegistry.getBuiltInCommands();
@@ -48,7 +48,7 @@ export async function startChatSession(
   if (processImmediately) {
     const initialPrompt = app.conversation.messages.pop()?.content;
     if (initialPrompt) {
-      console.log(PROMPT_MARKER, initialPrompt, '\n');
+      console.log(PROMPT_MARKER, initialPrompt);
       app.logProcessing(initialPrompt);
       app.conversation = addMessageToConversation(app.conversation, 'user', initialPrompt);
       await app.runLLM();
@@ -77,7 +77,6 @@ export async function startChatSession(
     }
 
     if (input) {
-      console.log('');
       app.conversation = addMessageToConversation(app.conversation, 'user', input);
       await app.runLLM();
       app.logUsage();

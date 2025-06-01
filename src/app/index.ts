@@ -28,6 +28,11 @@ export class SynapseApp {
   async runLLM() {
     let assistantResponse = '';
 
+    // intentional blank line before output
+    if (process.stdout.isTTY) {
+      console.log('');
+    }
+
     if (this.config.streamOutput()) {
       if (this.config.showColor()) {
         startSpinner();
@@ -45,7 +50,11 @@ export class SynapseApp {
           assistantResponse += chunk;
         }
       }
-      console.log('\n');
+
+      // extra blank line after output
+      if (process.stdout.isTTY) {
+        console.log('');
+      }
     } else {
       // generate the full response without streaming
       startSpinner();
@@ -57,6 +66,11 @@ export class SynapseApp {
       } else {
         console.log(assistantResponse);
       }
+    }
+
+    // intentional blank line after output
+    if (process.stdout.isTTY) {
+      console.log('');
     }
 
     // add new response to conversation and save

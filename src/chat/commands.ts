@@ -1,9 +1,9 @@
 import type { Interface as ReadlineInterface } from 'node:readline';
 import clipboardy from 'clipboardy';
 
+import type { SynapseApp } from '../app';
 import { PROMPT_MARKER } from '../cli/prompt-marker';
 import { colorCodeBlocks } from '../color';
-import type { ConfigManager } from '../config';
 import type { Conversation } from '../conversation';
 
 export interface Command {
@@ -15,10 +15,7 @@ export interface Command {
 class CommandRegistry {
   private commands = new Map<string, Command>();
 
-  constructor(
-    private conversation: Conversation,
-    private config: ConfigManager,
-  ) {}
+  constructor(private app: SynapseApp) {}
 
   registerCommand(command: Command): void {
     this.commands.set(command.name, command);
@@ -38,7 +35,7 @@ class CommandRegistry {
         name: 'convo',
         description: 'Show conversation history',
         execute: (rl: ReadlineInterface) => {
-          const { messages } = this.conversation;
+          const { messages } = this.app.conversation;
 
           if (messages.length === 0 || (messages.length === 1 && messages[0].role === 'system')) {
             console.log('\nNo conversation history found.\n');
@@ -57,7 +54,7 @@ class CommandRegistry {
                 }
                 break;
               case 'assistant': {
-                const content = this.config.showColor()
+                const content = this.app.config.showColor()
                   ? colorCodeBlocks(message.content)
                   : message.content;
                 console.log(content);
@@ -79,14 +76,14 @@ class CommandRegistry {
         name: 'copy',
         description: 'Copy last response to clipboard',
         execute: (rl: ReadlineInterface) => {
-          if (!this.conversation || this.conversation.messages.length === 0) {
+          if (!this.app.conversation || this.app.conversation.messages.length === 0) {
             console.log('No conversation found to copy from.');
             rl.prompt();
             return;
           }
 
           // Find the most recent assistant message
-          const lastAssistantMessage = this.conversation.messages
+          const lastAssistantMessage = this.app.conversation.messages
             .slice()
             .reverse()
             .find((msg) => msg.role === 'assistant');
@@ -138,7 +135,7 @@ class CommandRegistry {
   }
 
   updateConversation(conversation: Conversation): void {
-    this.conversation = conversation;
+    this.app.conversation = conversation;
   }
 
   clear(): void {

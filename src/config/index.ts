@@ -135,7 +135,7 @@ export class ConfigManager {
     const colorPref = colorArg ?? this.config.general.color ?? false;
 
     // disable no matter what if there's no terminal to output to
-    this.config.general.color = process.stdout.isTTY && colorPref;
+    this.config.general.color = (process.stdout.isTTY && colorPref) ?? false;
   }
 
   /**
@@ -148,7 +148,7 @@ export class ConfigManager {
     const streamPref = streamArg ?? this.config.general.stream ?? false;
 
     // disable no matter what if there's no terminal to output to
-    this.config.general.stream = process.stdout.isTTY && streamPref;
+    this.config.general.stream = (process.stdout.isTTY && streamPref) ?? false;
   }
 
   /**
