@@ -139,7 +139,6 @@ export class ConfigManager {
     } else if (noColorArg !== undefined) {
       color = false;
     } else {
-      console.log(process.stdout.isTTY);
       color = process.stdout.isTTY && this.config.general.color;
     }
 
@@ -160,7 +159,6 @@ export class ConfigManager {
     } else if (noStreamArg !== undefined) {
       stream = false;
     } else {
-      console.log(process.stdout.isTTY);
       stream = process.stdout.isTTY && this.config.general.stream;
     }
 
