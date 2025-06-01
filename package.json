@@ -6,9 +6,9 @@
     "type": "git",
     "url": "https://github.com/drewzemke/synapse.git"
   },
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "bin": {
-    "sy": "dist/index.js"
+    "sy": "dist/index.cjs"
   },
   "scripts": {
     "build": "node ./esbuild.mjs",
@@ -29,7 +29,7 @@
     "anthropic",
     "claude"
   ],
-  "author": "",
+  "author": "Drew Zemke",
   "license": "MIT",
   "packageManager": "pnpm@10.11.0",
   "dependencies": {

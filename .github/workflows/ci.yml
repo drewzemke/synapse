@@ -37,7 +37,7 @@ jobs:
         run: pnpm build
 
       - name: Verify Build
-        run: node ./dist/index.js --help
+        run: node ./dist/index.cjs --help
       
       - name: Run Tests
         run: pnpm test
