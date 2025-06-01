@@ -18,9 +18,7 @@ export interface SynapseArgs {
   extend?: boolean;
   last?: boolean;
   color?: boolean;
-  noColor?: boolean;
   stream?: boolean;
-  noStream?: boolean;
 }
 
 /**
@@ -85,9 +83,6 @@ export function parseArgs(args: string[]): SynapseArgs {
     })
     .conflicts({
       last: ['profile', 'extend', 'model'],
-      // FIXME: this doesn't seem to work :(
-      color: 'no-color',
-      stream: 'no-stream',
     })
     .example('$0 "What is a binary tree?"', 'Send a simple query to the LLM')
     .example('$0 -p coding "Explain recursion"', 'Use a pre-configured profile for a query')

@@ -63,8 +63,8 @@ export class ConfigManager {
     }
 
     // resolve color and stream settings with the config settings
-    this.resolveColorOutput(args.color, args.noColor);
-    this.resolveStreamOutput(args.stream, args.noStream);
+    this.resolveColorOutput(args.color);
+    this.resolveStreamOutput(args.stream);
 
     return this.config;
   }
@@ -127,42 +127,28 @@ export class ConfigManager {
 
   /**
    * Resolve whether to use color output based on CLI args and config
-   * @param colorArg CLI --color flag value
-   * @param noColorArg CLI --no-color flag value
+   * @param colorArg CLI --color or --no-color flag value
    */
-  private resolveColorOutput(colorArg?: boolean, noColorArg?: boolean) {
-    let color: boolean | undefined;
+  private resolveColorOutput(colorArg?: boolean) {
+    // prefer the passed in arg first, then the config loaded from the file,
+    // falling back to false
+    const colorPref = colorArg ?? this.config.general.color ?? false;
 
-    // check if explicitly specified in CLI args
-    if (colorArg !== undefined) {
-      color = true;
-    } else if (noColorArg !== undefined) {
-      color = false;
-    } else {
-      color = process.stdout.isTTY && this.config.general.color;
-    }
-
-    this.config.general.color = color ?? false;
+    // disable no matter what if there's no terminal to output to
+    this.config.general.color = process.stdout.isTTY && colorPref;
   }
 
   /**
    * Resolve whether to stream output based on CLI args and config
-   * @param streamArg CLI --stream flag value
-   * @param noStreamArg CLI --no-stream flag value
+   * @param streamArg CLI --stream or --no-stream flag value
    */
-  private resolveStreamOutput(streamArg?: boolean, noStreamArg?: boolean) {
-    let stream: boolean | undefined;
+  private resolveStreamOutput(streamArg?: boolean) {
+    // prefer the passed in arg first, then the config loaded from the file,
+    // falling back to false
+    const streamPref = streamArg ?? this.config.general.stream ?? false;
 
-    // check if explicitly specified in CLI args
-    if (streamArg !== undefined) {
-      stream = true;
-    } else if (noStreamArg !== undefined) {
-      stream = false;
-    } else {
-      stream = process.stdout.isTTY && this.config.general.stream;
-    }
-
-    this.config.general.stream = stream ?? false;
+    // disable no matter what if there's no terminal to output to
+    this.config.general.stream = process.stdout.isTTY && streamPref;
   }
 
   /**

@@ -82,9 +82,8 @@ export class SynapseApp {
     console.log(`Using model: ${model.modelStr}`);
     console.log(`Using profile: ${this.profileName || '<none>'}`);
     console.log(`Profile temperature: ${profile.temperature}`);
-    // FIXME: bring these back
-    // console.log(`Code coloring: ${printColor ? 'on' : 'off'}`);
-    // console.log(`Response streaming: ${streamOutput ? 'on' : 'off'}`);
+    console.log(`Code coloring: ${this.config.showColor() ? 'on' : 'off'}`);
+    console.log(`Response streaming: ${this.config.streamOutput() ? 'on' : 'off'}`);
     if (this.conversation.messages.length > 2) {
       console.log('Continuing previous conversation');
     }
