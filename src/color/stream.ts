@@ -125,6 +125,7 @@ export async function streamWithCodeColor(llm: LLM, conversation: Conversation):
   try {
     response = await streamWithCodeColorInner(llm, conversation);
   } finally {
+    stopSpinner();
     // show the cursor in case we crashed while it was hidden
     showCursor();
   }
