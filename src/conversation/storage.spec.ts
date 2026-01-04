@@ -110,6 +110,30 @@ describe('Conversation storage', () => {
       expect(parsedJson.temperature).toBe(mockConversation.temperature);
       expect(parsedJson.messages).toHaveLength(mockConversation.messages.length);
     });
+
+    it('should filter out empty messages before saving', async () => {
+      const { saveConversation } = await import('./storage.js');
+
+      const conversationWithEmpty: Conversation = {
+        profile: 'default',
+        temperature: 0.7,
+        messages: [
+          { role: 'user', content: 'Valid message' },
+          { role: 'assistant', content: '' },
+          { role: 'user', content: '   ' },
+          { role: 'assistant', content: 'Another valid message' },
+        ],
+      };
+
+      saveConversation(conversationWithEmpty);
+
+      const jsonContent = vi.mocked(writeFileSync).mock.calls[0][1] as string;
+      const parsedJson = JSON.parse(jsonContent) as Conversation;
+
+      expect(parsedJson.messages).toHaveLength(2);
+      expect(parsedJson.messages[0].content).toBe('Valid message');
+      expect(parsedJson.messages[1].content).toBe('Another valid message');
+    });
   });
 
   describe('loadLastConversation', () => {

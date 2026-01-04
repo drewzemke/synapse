@@ -27,8 +27,14 @@ export function saveConversation(conversation: Conversation): void {
   // Ensure the conversations directory exists
   createConversationDirectory();
 
+  // filter out any empty messages before saving
+  const cleanedConversation = {
+    ...conversation,
+    messages: conversation.messages.filter((msg) => msg.content?.trim()),
+  };
+
   // Convert the conversation to JSON
-  const jsonContent = JSON.stringify(conversation, undefined, 2);
+  const jsonContent = JSON.stringify(cleanedConversation, undefined, 2);
 
   // Write to the last.json file
   const conversationsDir = getConversationsDir();
