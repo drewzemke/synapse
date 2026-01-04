@@ -170,4 +170,32 @@ describe('Conversation storage', () => {
       expect(result?.messages[2].role).toBe('assistant');
     });
   });
+
+  describe('addMessageToConversation', () => {
+    it('should add a valid message to the conversation', async () => {
+      const { addMessageToConversation } = await import('./storage.js');
+
+      const result = addMessageToConversation(mockConversation, 'user', 'New message');
+
+      expect(result.messages).toHaveLength(4);
+      expect(result.messages[3].role).toBe('user');
+      expect(result.messages[3].content).toBe('New message');
+    });
+
+    it('should not add empty messages', async () => {
+      const { addMessageToConversation } = await import('./storage.js');
+
+      const result = addMessageToConversation(mockConversation, 'user', '');
+
+      expect(result.messages).toHaveLength(3);
+    });
+
+    it('should not add whitespace-only messages', async () => {
+      const { addMessageToConversation } = await import('./storage.js');
+
+      const result = addMessageToConversation(mockConversation, 'user', '   \n\t  ');
+
+      expect(result.messages).toHaveLength(3);
+    });
+  });
 });

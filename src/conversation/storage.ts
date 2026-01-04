@@ -75,6 +75,11 @@ export function addMessageToConversation(
   role: 'system' | 'user' | 'assistant',
   content: string,
 ): Conversation {
+  // don't add empty or whitespace-only messages
+  if (!content || !content.trim()) {
+    return conversation;
+  }
+
   return {
     ...conversation,
     messages: [...conversation.messages, { role, content }],
