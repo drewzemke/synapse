@@ -1,3 +1,12 @@
+## [1.14.1](https://github.com/drewzemke/synapse/compare/v1.14.0...v1.14.1) (2026-01-05)
+
+
+### Bug Fixes
+
+* **conversation:** filter out empty messages when saving conversations ([c891c8f](https://github.com/drewzemke/synapse/commit/c891c8f90550c15da5181b0b55056983ce5b08bd))
+* **conversation:** prevent adding empty messages to conversations ([66dbc4d](https://github.com/drewzemke/synapse/commit/66dbc4df60b0890b6ecc01e6f814d361e64be5bb))
+* **spinner:** stop spinner in finally block to prevent hanging on errors ([50f49c1](https://github.com/drewzemke/synapse/commit/50f49c176b0eb297f9d86903b0b6fcc9843606de))
+
 # [1.14.0](https://github.com/drewzemke/synapse/compare/v1.13.3...v1.14.0) (2025-06-01)
 
 
